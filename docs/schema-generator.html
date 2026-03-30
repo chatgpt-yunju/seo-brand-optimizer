@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>结构化数据生成 - SEO品牌优化系统</title>
+    <meta name="description" content="生成Schema.org结构化数据，提升搜索引擎展示效果">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>📋 结构化数据生成器</h1>
+            <p class="subtitle">生成Schema.org JSON-LD结构化数据</p>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="/">📊 SEO分析</a></li>
+                <li><a href="/submit.html">🚀 搜索引擎推送</a></li>
+                <li><a href="/backlinks.html">🔗 外链发布</a></li>
+                <li><a href="/meta-optimizer.html">⚙️ 元标签优化</a></li>
+                <li><a href="/sitemap-generator.html">🗺️ 网站地图</a></li>
+                <li><a href="/schema-generator.html" class="active">📋 结构化数据</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="container">
+            <section class="card">
+                <h2>🏢 选择结构化数据类型</h2>
+                <div class="schema-types">
+                    <label class="schema-type-card">
+                        <input type="radio" name="schemaType" value="organization" checked onchange="showSchemaForm()">
+                        <span class="schema-icon">🏢</span>
+                        <span class="schema-name">Organization</span>
+                        <span class="schema-desc">公司/组织信息</span>
+                    </label>
+                    <label class="schema-type-card">
+                        <input type="radio" name="schemaType" value="localBusiness" onchange="showSchemaForm()">
+                        <span class="schema-icon">🏪</span>
+                        <span class="schema-name">LocalBusiness</span>
+                        <span class="schema-desc">本地商家信息</span>
+                    </label>
+                    <label class="schema-type-card">
+                        <input type="radio" name="schemaType" value="product" onchange="showSchemaForm()">
+                        <span class="schema-icon">📦</span>
+                        <span class="schema-name">Product</span>
+                        <span class="schema-desc">产品信息</span>
+                    </label>
+                    <label class="schema-type-card">
+                        <input type="radio" name="schemaType" value="article" onchange="showSchemaForm()">
+                        <span class="schema-icon">📰</span>
+                        <span class="schema-name">Article</span>
+                        <span class="schema-desc">文章/博客</span>
+                    </label>
+                </div>
+            </section>
+
+            <section class="card" id="schemaForm">
+                <h2>📝 填写信息</h2>
+                <div class="form-grid" id="formFields">
+                    <!-- 动态生成表单字段 -->
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🔧 生成代码</h2>
+                <div class="btn-group">
+                    <button onclick="generateSchema()" class="btn-primary">生成JSON-LD</button>
+                    <button onclick="copySchema()" class="btn-secondary">复制代码</button>
+                    <button onclick="testSchema()" class="btn-outline">测试结构化数据</button>
+                </div>
+                <pre id="schemaCode" class="code-block"><!-- 点击"生成JSON-LD"查看结果 --></pre>
+            </section>
+
+            <section class="card">
+                <h2>🔍 结构化数据测试</h2>
+                <div class="test-links">
+                    <a href="https://search.google.com/test/rich-results" target="_blank" class="test-link">
+                        <span>🔍 Google结构化数据测试工具</span>
+                    </a>
+                    <a href="https://validator.schema.org/" target="_blank" class="test-link">
+                        <span>✅ Schema.org验证器</span>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 SEO品牌优化系统</p>
+        </div>
+    </footer>
+
+    <script>
+        // Schema类型配置
+        const schemaConfigs = {
+            organization: [
+                { name: 'name', label: '组织名称', type: 'text', required: true },
+                { name: 'url', label: '网站URL', type: 'url', required: true },
+                { name: 'logo', label: 'Logo URL', type: 'url' },
+                { name: 'description', label: '描述', type: 'textarea' },
+                { name: 'sameAs', label: '社交媒体链接（用逗号分隔）', type: 'text' }
+            ],
+            localBusiness: [
+                { name: 'name', label: '商家名称', type: 'text', required: true },
+                { name: 'url', label: '网站URL', type: 'url', required: true },
+                { name: 'telephone', label: '联系电话', type: 'text', required: true },
+                { name: 'addressStreet', label: '街道地址', type: 'text', required: true },
+                { name: 'addressLocality', label: '城市', type: 'text', required: true },
+                { name: 'addressRegion', label: '省份', type: 'text', required: true },
+                { name: 'postalCode', label: '邮编', type: 'text' },
+                { name: 'latitude', label: '纬度', type: 'number' },
+                { name: 'longitude', label: '经度', type: 'number' },
+                { name: 'openingHours', label: '营业时间', type: 'text', placeholder: 'Mo-Fr 09:00-18:00' },
+                { name: 'priceRange', label: '价格区间', type: 'text', placeholder: '$$' }
+            ],
+            product: [
+                { name: 'name', label: '产品名称', type: 'text', required: true },
+                { name: 'image', label: '产品图片URL', type: 'url', required: true },
+                { name: 'description', label: '产品描述', type: 'textarea' },
+                { name: 'sku', label: '产品SKU', type: 'text' },
+                { name: 'brand', label: '品牌', type: 'text' },
+                { name: 'price', label: '价格', type: 'number', required: true },
+                { name: 'priceCurrency', label: '货币', type: 'text', placeholder: 'CNY' },
+                { name: 'availability', label: '库存状态', type: 'select', options: ['InStock', 'OutOfStock', 'PreOrder'] }
+            ],
+            article: [
+                { name: 'headline', label: '文章标题', type: 'text', required: true },
+                { name: 'image', label: '封面图片URL', type: 'url' },
+                { name: 'authorName', label: '作者名称', type: 'text', required: true },
+                { name: 'authorUrl', label: '作者主页', type: 'url' },
+                { name: 'datePublished', label: '发布日期', type: 'date', required: true },
+                { name: 'dateModified', label: '修改日期', type: 'date' },
+                { name: 'description', label: '文章摘要', type: 'textarea' },
+                { name: 'articleSection', label: '文章分类', type: 'text' }
+            ]
+        };
+
+        // 显示对应表单
+        function showSchemaForm() {
+            const type = document.querySelector('input[name="schemaType"]:checked').value;
+            const fields = schemaConfigs[type];
+            const formFields = document.getElementById('formFields');
+
+            formFields.innerHTML = fields.map(field => {
+                let input = '';
+                if (field.type === 'select') {
+                    input = `<select id="field_${field.name}">
+                        ${field.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                    </select>`;
+                } else if (field.type === 'textarea') {
+                    input = `<textarea id="field_${field.name}" rows="3"></textarea>`;
+                } else if (field.type === 'date') {
+                    input = `<input type="date" id="field_${field.name}">`;
+                } else if (field.type === 'number') {
+                    input = `<input type="number" id="field_${field.name}">`;
+                } else {
+                    input = `<input type="${field.type}" id="field_${field.name}" placeholder="${field.placeholder || ''}">`;
+                }
+
+                return `
+                    <div class="form-group ${field.required ? 'required' : ''}">
+                        <label>${field.label}${field.required ? ' *' : ''}</label>
+                        ${input}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 生成Schema
+        function generateSchema() {
+            const type = document.querySelector('input[name="schemaType"]:checked').value;
+            const fields = schemaConfigs[type];
+            const data = {};
+
+            fields.forEach(field => {
+                const value = document.getElementById(`field_${field.name}`)?.value;
+                if (value) {
+                    data[field.name] = value;
+                }
+            });
+
+            // 验证必填字段
+            const missing = fields.filter(f => f.required && !data[f.name]);
+            if (missing.length > 0) {
+                alert(`请填写以下必填字段：${missing.map(f => f.label).join(', ')}`);
+                return;
+            }
+
+            // 构建JSON-LD
+            let schema = {};
+            switch (type) {
+                case 'organization':
+                    schema = {
+                        "@context": "https://schema.org",
+                        "@type": "Organization",
+                        "name": data.name,
+                        "url": data.url
+                    };
+                    if (data.logo) schema.logo = data.logo;
+                    if (data.description) schema.description = data.description;
+                    if (data.sameAs) {
+                        schema.sameAs = data.sameAs.split(',').map(s => s.trim());
+                    }
+                    break;
+
+                case 'localBusiness':
+                    schema = {
+                        "@context": "https://schema.org",
+                        "@type": "LocalBusiness",
+                        "name": data.name,
+                        "url": data.url,
+                        "telephone": data.telephone,
+                        "address": {
+                            "@type": "PostalAddress",
+                            "streetAddress": data.addressStreet,
+                            "addressLocality": data.addressLocality,
+                            "addressRegion": data.addressRegion,
+                            "postalCode": data.postalCode
+                        }
+                    };
+                    if (data.latitude && data.longitude) {
+                        schema.geo = {
+                            "@type": "GeoCoordinates",
+                            "latitude": data.latitude,
+                            "longitude": data.longitude
+                        };
+                    }
+                    if (data.openingHours) schema.openingHours = data.openingHours;
+                    if (data.priceRange) schema.priceRange = data.priceRange;
+                    break;
+
+                case 'product':
+                    schema = {
+                        "@context": "https://schema.org",
+                        "@type": "Product",
+                        "name": data.name,
+                        "image": data.image,
+                        "description": data.description
+                    };
+                    if (data.sku) schema.sku = data.sku;
+                    if (data.brand) schema.brand = { "@type": "Brand", "name": data.brand };
+                    schema.offers = {
+                        "@type": "Offer",
+                        "price": data.price,
+                        "priceCurrency": data.priceCurrency || "CNY",
+                        "availability": `https://schema.org/${data.availability || 'InStock'}`
+                    };
+                    break;
+
+                case 'article':
+                    schema = {
+                        "@context": "https://schema.org",
+                        "@type": "Article",
+                        "headline": data.headline,
+                        "image": data.image,
+                        "author": {
+                            "@type": "Person",
+                            "name": data.authorName,
+                            "url": data.authorUrl
+                        },
+                        "datePublished": data.datePublished
+                    };
+                    if (data.dateModified) schema.dateModified = data.dateModified;
+                    if (data.description) schema.description = data.description;
+                    if (data.articleSection) schema.articleSection = data.articleSection;
+                    break;
+            }
+
+            const jsonLd = JSON.stringify(schema, null, 2);
+            const code = `<script type="application/ld+json">
+${jsonLd}
+<\/script>`;
+
+            document.getElementById('schemaCode').textContent = code;
+        }
+
+        // 复制代码
+        function copySchema() {
+            const code = document.getElementById('schemaCode').textContent;
+            if (!code || code.includes('点击"生成JSON-LD"')) {
+                alert('请先生成结构化数据');
+                return;
+            }
+            navigator.clipboard.writeText(code).then(() => {
+                alert('代码已复制到剪贴板！');
+            });
+        }
+
+        // 测试结构化数据
+        function testSchema() {
+            window.open('https://search.google.com/test/rich-results', '_blank');
+        }
+
+        // 初始化
+        showSchemaForm();
+    </script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>元标签优化 - SEO品牌优化系统</title>
+    <meta name="description" content="生成SEO友好的元标签、Open Graph、Twitter Card等">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>⚙️ 元标签优化工具</h1>
+            <p class="subtitle">生成SEO友好的Meta标签</p>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="/">📊 SEO分析</a></li>
+                <li><a href="/submit.html">🚀 搜索引擎推送</a></li>
+                <li><a href="/backlinks.html">🔗 外链发布</a></li>
+                <li><a href="/meta-optimizer.html" class="active">⚙️ 元标签优化</a></li>
+                <li><a href="/sitemap-generator.html">🗺️ 网站地图</a></li>
+                <li><a href="/schema-generator.html">📋 结构化数据</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="container">
+            <section class="card">
+                <h2>📝 元标签配置</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>页面标题 (Title)</label>
+                        <input type="text" id="metaTitle" placeholder="不超过60个字符" maxlength="60">
+                        <small>建议长度：30-60字符 | 当前：<span id="titleCount">0</span>/60</small>
+                    </div>
+                    <div class="form-group">
+                        <label>页面描述 (Description)</label>
+                        <textarea id="metaDescription" rows="3" placeholder="不超过160个字符" maxlength="160"></textarea>
+                        <small>建议长度：50-160字符 | 当前：<span id="descCount">0</span>/160</small>
+                    </div>
+                    <div class="form-group">
+                        <label>关键词 (Keywords)</label>
+                        <input type="text" id="metaKeywords" placeholder="关键词1, 关键词2, 关键词3">
+                    </div>
+                    <div class="form-group">
+                        <label>Canonical URL</label>
+                        <input type="url" id="canonicalUrl" placeholder="https://example.com/page">
+                    </div>
+                    <div class="form-group">
+                        <label>页面URL</label>
+                        <input type="url" id="pageUrl" placeholder="https://example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>网站名称</label>
+                        <input type="text" id="siteName" placeholder="网站名称">
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🔗 Open Graph 标签</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>OG标题</label>
+                        <input type="text" id="ogTitle" placeholder="社交媒体分享时显示的标题">
+                    </div>
+                    <div class="form-group">
+                        <label>OG描述</label>
+                        <textarea id="ogDescription" rows="2" placeholder="社交媒体分享时显示的描述"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>OG图片URL</label>
+                        <input type="url" id="ogImage" placeholder="https://example.com/image.jpg">
+                    </div>
+                    <div class="form-group">
+                        <label>OG类型</label>
+                        <select id="ogType">
+                            <option value="website">website</option>
+                            <option value="article">article</option>
+                            <option value="product">product</option>
+                            <option value="business.business">business</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🐦 Twitter Card 标签</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Twitter Card 类型</label>
+                        <select id="twitterCard">
+                            <option value="summary">summary</option>
+                            <option value="summary_large_image">summary_large_image</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Twitter 站点</label>
+                        <input type="text" id="twitterSite" placeholder="@username">
+                    </div>
+                    <div class="form-group">
+                        <label>Twitter 作者</label>
+                        <input type="text" id="twitterCreator" placeholder="@username">
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🔍 SERP 预览</h2>
+                <div class="serp-preview">
+                    <div class="serp-google">
+                        <div class="serp-url">https://example.com › ...</div>
+                        <div class="serp-title" id="serpTitle">页面标题</div>
+                        <div class="serp-description">页面描述会显示在这里...</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>📋 生成的代码</h2>
+                <div class="btn-group">
+                    <button onclick="generateMetaTags()" class="btn-primary">生成代码</button>
+                    <button onclick="copyMetaTags()" class="btn-secondary">复制代码</button>
+                    <button onclick="downloadMetaTags()" class="btn-outline">下载HTML</button>
+                </div>
+                <pre id="generatedCode" class="code-block"><!-- 点击"生成代码"查看结果 --></pre>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 SEO品牌优化系统</p>
+        </div>
+    </footer>
+
+    <script>
+        // 实时更新计数器和预览
+        document.getElementById('metaTitle').addEventListener('input', function() {
+            document.getElementById('titleCount').textContent = this.value.length;
+            document.getElementById('serpTitle').textContent = this.value || '页面标题';
+        });
+
+        document.getElementById('metaDescription').addEventListener('input', function() {
+            document.getElementById('descCount').textContent = this.value.length;
+        });
+
+        // 生成Meta标签代码
+        function generateMetaTags() {
+            const title = document.getElementById('metaTitle').value;
+            const description = document.getElementById('metaDescription').value;
+            const keywords = document.getElementById('metaKeywords').value;
+            const canonicalUrl = document.getElementById('canonicalUrl').value;
+            const pageUrl = document.getElementById('pageUrl').value;
+            const siteName = document.getElementById('siteName').value;
+
+            const ogTitle = document.getElementById('ogTitle').value || title;
+            const ogDescription = document.getElementById('ogDescription').value || description;
+            const ogImage = document.getElementById('ogImage').value;
+            const ogType = document.getElementById('ogType').value;
+
+            const twitterCard = document.getElementById('twitterCard').value;
+            const twitterSite = document.getElementById('twitterSite').value;
+            const twitterCreator = document.getElementById('twitterCreator').value;
+
+            let code = `<!-- SEO Meta Tags -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">`;
+
+            if (title) code += `\n<title>${title}</title>`;
+            if (description) code += `\n<meta name="description" content="${description}">`;
+            if (keywords) code += `\n<meta name="keywords" content="${keywords}">`;
+            if (canonicalUrl) code += `\n<link rel="canonical" href="${canonicalUrl}">`;
+
+            code += `\n\n<!-- Open Graph -->
+<meta property="og:title" content="${ogTitle}">
+<meta property="og:description" content="${ogDescription}">`;
+            if (ogImage) code += `\n<meta property="og:image" content="${ogImage}">`;
+            code += `\n<meta property="og:url" content="${pageUrl}">
+<meta property="og:type" content="${ogType}">`;
+            if (siteName) code += `\n<meta property="og:site_name" content="${siteName}">`;
+
+            code += `\n\n<!-- Twitter Card -->
+<meta name="twitter:card" content="${twitterCard}">
+<meta name="twitter:title" content="${ogTitle}">
+<meta name="twitter:description" content="${ogDescription}">`;
+            if (ogImage) code += `\n<meta name="twitter:image" content="${ogImage}">`;
+            if (twitterSite) code += `\n<meta name="twitter:site" content="${twitterSite}">`;
+            if (twitterCreator) code += `\n<meta name="twitter:creator" content="${twitterCreator}">`;
+
+            document.getElementById('generatedCode').textContent = code;
+        }
+
+        // 复制代码
+        function copyMetaTags() {
+            const code = document.getElementById('generatedCode').textContent;
+            if (!code || code.includes('点击"生成代码"')) {
+                alert('请先点击"生成代码"');
+                return;
+            }
+            navigator.clipboard.writeText(code).then(() => {
+                alert('代码已复制到剪贴板！');
+            });
+        }
+
+        // 下载HTML
+        function downloadMetaTags() {
+            const code = document.getElementById('generatedCode').textContent;
+            if (!code || code.includes('点击"生成代码"')) {
+                alert('请先点击"生成代码"');
+                return;
+            }
+
+            const html = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    ${code}
+</head>
+<body>
+    <!-- Your Content Here -->
+</body>
+</html>`;
+
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'seo-meta-tags.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

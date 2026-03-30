@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关键词分析 - SEO品牌优化系统</title>
+    <meta name="description" content="分析关键词密度，优化内容SEO">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>📈 关键词分析工具</h1>
+            <p class="subtitle">分析关键词密度，优化内容SEO</p>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="/">📊 SEO分析</a></li>
+                <li><a href="/submit.html">🚀 搜索引擎推送</a></li>
+                <li><a href="/backlinks.html">🔗 外链发布</a></li>
+                <li><a href="/meta-optimizer.html">⚙️ 元标签优化</a></li>
+                <li><a href="/keywords.html" class="active">📈 关键词分析</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="container">
+            <section class="card">
+                <h2>🔑 输入要分析的关键词</h2>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>目标关键词（用逗号分隔）</label>
+                        <input type="text" id="targetKeywords" placeholder="SEO, 网站优化, 关键词密度" value="SEO,网站优化">
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>📝 输入要分析的内容</h2>
+                <div class="input-group">
+                    <textarea id="contentToAnalyze" rows="12" placeholder="请粘贴要分析的网页内容或文章内容..."></textarea>
+                </div>
+                <div class="btn-group">
+                    <button onclick="analyzeKeywords()" class="btn-primary">分析关键词</button>
+                    <button onclick="loadSampleContent()" class="btn-outline">加载示例内容</button>
+                </div>
+            </section>
+
+            <section class="card" id="keywordResults" style="display: none;">
+                <h2>📊 分析结果</h2>
+                <div class="keyword-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalWords">0</div>
+                        <div class="stat-label">总字数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="uniqueWords">0</div>
+                        <div class="stat-label">唯一词数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="keywordCount">0</div>
+                        <div class="stat-label">关键词出现次数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="keywordDensity">0%</div>
+                        <div class="stat-label">关键词密度</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card" id="keywordDetails" style="display: none;">
+                <h2>🔍 关键词详情</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>关键词</th>
+                            <th>出现次数</th>
+                            <th>密度</th>
+                            <th>建议</th>
+                        </tr>
+                    </thead>
+                    <tbody id="keywordTableBody"></tbody>
+                </table>
+            </section>
+
+            <section class="card">
+                <h2>💡 关键词优化建议</h2>
+                <div class="tips">
+                    <div class="tip">
+                        <h4>✅ 理想密度</h4>
+                        <p>关键词密度建议在1%-3%之间，过高可能被认为作弊，过低则无法突出主题。</p>
+                    </div>
+                    <div class="tip">
+                        <h4>📍 关键词位置</h4>
+                        <p>关键词应出现在：标题、H1-H3标签、段落开头、图片ALT属性、Meta标签中。</p>
+                    </div>
+                    <div class="tip">
+                        <h4>🔄 长尾关键词</h4>
+                        <p>除了核心关键词，建议使用长尾关键词（如"如何优化SEO"）来获取更多精准流量。</p>
+                    </div>
+                    <div class="tip">
+                        <h4>⚖️ 语义相关</h4>
+                        <p>使用与核心关键词语义相关的词汇，有助于提升内容的整体相关性。</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 SEO品牌优化系统</p>
+        </div>
+    </footer>
+
+    <script>
+        // 加载示例内容
+        function loadSampleContent() {
+            document.getElementById('contentToAnalyze').value = `SEO（Search Engine Optimization）即搜索引擎优化，是一种通过优化网站内容和结构来提升搜索引擎排名的技术。
+
+网站优化主要包括以下几个方面的内容：
+
+1. 内容优化：创建高质量、原创的内容，确保内容与目标关键词相关。
+
+2. 技术优化：优化网站速度、提升移动端体验、确保网站结构清晰。
+
+3. 外链建设：通过获取高质量的外部链接来提升网站权重。
+
+4. 用户体验：提供良好的浏览体验，降低跳出率，提高转化率。
+
+在进行SEO优化时，需要注意关键词的合理使用。关键词密度是衡量网页相关性的重要指标，一般建议控制在1%-3%之间。
+
+除了核心关键词，还应该关注长尾关键词的优化。长尾关键词虽然搜索量较低，但转化率通常较高。
+
+总之，SEO是一个持续优化的过程，需要不断学习和实践。`;
+            document.getElementById('targetKeywords').value = 'SEO,网站优化,关键词密度';
+        }
+
+        // 分析关键词
+        function analyzeKeywords() {
+            const content = document.getElementById('contentToAnalyze').value;
+            const keywordsStr = document.getElementById('targetKeywords').value;
+
+            if (!content.trim()) {
+                alert('请输入要分析的内容');
+                return;
+            }
+            if (!keywordsStr.trim()) {
+                alert('请输入目标关键词');
+                return;
+            }
+
+            const keywords = keywordsStr.split(',').map(k => k.trim()).filter(k => k);
+            const words = content.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, ' ').split(/\s+/).filter(w => w);
+            const totalWords = words.length;
+
+            // 统计每个关键词
+            const results = keywords.map(keyword => {
+                const regex = new RegExp(keyword, 'gi');
+                const matches = content.match(regex);
+                const count = matches ? matches.length : 0;
+                const density = totalWords > 0 ? (count / totalWords * 100) : 0;
+
+                let suggestion = '良好';
+                if (density < 0.5) suggestion = '偏低';
+                else if (density > 3) suggestion = '偏高';
+                else if (density >= 1 && density <= 3) suggestion = '理想';
+
+                return { keyword, count, density, suggestion };
+            });
+
+            // 显示结果
+            document.getElementById('keywordResults').style.display = 'block';
+            document.getElementById('keywordDetails').style.display = 'block';
+
+            // 更新统计
+            const uniqueWords = new Set(words).size;
+            const totalKeywordCount = results.reduce((sum, r) => sum + r.count, 0);
+            const totalDensity = totalWords > 0 ? (totalKeywordCount / totalWords * 100) : 0;
+
+            document.getElementById('totalWords').textContent = totalWords;
+            document.getElementById('uniqueWords').textContent = uniqueWords;
+            document.getElementById('keywordCount').textContent = totalKeywordCount;
+            document.getElementById('keywordDensity').textContent = totalDensity.toFixed(2) + '%';
+
+            // 更新表格
+            const tbody = document.getElementById('keywordTableBody');
+            tbody.innerHTML = results.map(r => `
+                <tr>
+                    <td><strong>${r.keyword}</strong></td>
+                    <td>${r.count}</td>
+                    <td>${r.density.toFixed(2)}%</td>
+                    <td><span class="status-badge ${r.suggestion === '理想' ? 'success' : r.suggestion === '良好' ? 'success' : 'warning'}">${r.suggestion}</span></td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

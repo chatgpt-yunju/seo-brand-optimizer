@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO品牌优化系统 - 提升网站权重</title>
+    <meta name="description" content="专业的SEO优化工具，帮助您分析网站SEO状况、推送搜索引擎、自动发布外链，提升网站权重和排名">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>🔍 SEO品牌优化系统</h1>
+            <p class="subtitle">一站式提升网站搜索引擎权重</p>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="/" class="active">📊 SEO分析</a></li>
+                <li><a href="/submit.html">🚀 搜索引擎推送</a></li>
+                <li><a href="/backlinks.html">🔗 外链发布</a></li>
+                <li><a href="/meta-optimizer.html">⚙️ 元标签优化</a></li>
+                <li><a href="/sitemap-generator.html">🗺️ 网站地图</a></li>
+                <li><a href="/schema-generator.html">📋 结构化数据</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="container">
+            <!-- SEO分析区域 -->
+            <section class="card">
+                <h2>🔍 网站SEO分析</h2>
+                <div class="input-group">
+                    <input type="url" id="analyzeUrl" placeholder="请输入要分析的网站URL，如：https://example.com" required>
+                    <button onclick="analyzeWebsite()" class="btn-primary">开始分析</button>
+                </div>
+                <div id="analyzeResult"></div>
+            </section>
+
+            <!-- 快速操作 -->
+            <section class="card">
+                <h2>⚡ 快速操作</h2>
+                <div class="quick-actions">
+                    <a href="/submit.html" class="action-card">
+                        <span class="action-icon">🚀</span>
+                        <span class="action-title">推送搜索引擎</span>
+                        <span class="action-desc">主动推送到百度、360等</span>
+                    </a>
+                    <a href="/backlinks.html" class="action-card">
+                        <span class="action-icon">🔗</span>
+                        <span class="action-title">外链自动发布</span>
+                        <span class="action-desc">一键发布到100+平台</span>
+                    </a>
+                    <a href="/keywords.html" class="action-card">
+                        <span class="action-icon">📈</span>
+                        <span class="action-title">关键词分析</span>
+                        <span class="action-desc">分析关键词密度</span>
+                    </a>
+                    <a href="/performance.html" class="action-card">
+                        <span class="action-icon">⚡</span>
+                        <span class="action-title">性能优化</span>
+                        <span class="action-desc">Core Web Vitals检测</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- SEO评分展示 -->
+            <section class="card">
+                <h2>📊 SEO健康度评分</h2>
+                <div class="score-container">
+                    <div class="score-circle" id="mainScore">
+                        <span class="score-value">--</span>
+                        <span class="score-label">综合评分</span>
+                    </div>
+                    <div class="score-details">
+                        <div class="score-item">
+                            <span class="score-name">技术SEO</span>
+                            <div class="score-bar"><div class="score-fill" style="width: 0%"></div></div>
+                            <span class="score-num">0/100</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-name">内容SEO</span>
+                            <div class="score-bar"><div class="score-fill" style="width: 0%"></div></div>
+                            <span class="score-num">0/100</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-name">外链建设</span>
+                            <div class="score-bar"><div class="score-fill" style="width: 0%"></div></div>
+                            <span class="score-num">0/100</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-name">用户体验</span>
+                            <div class="score-bar"><div class="score-fill" style="width: 0%"></div></div>
+                            <span class="score-num">0/100</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 最近分析记录 -->
+            <section class="card">
+                <h2>📝 最近分析记录</h2>
+                <table class="data-table" id="analysisHistory">
+                    <thead>
+                        <tr>
+                            <th>URL</th>
+                            <th>评分</th>
+                            <th>问题数</th>
+                            <th>时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr><td colspan="5" class="empty-state">暂无分析记录</td></tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 SEO品牌优化系统 | 帮助客户网站提升搜索引擎权重</p>
+        </div>
+    </footer>
+
+    <script src="/js/seo-analyzer.js"></script>
+    <script>
+        // 加载历史记录
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('seoAnalysisHistory') || '[]');
+            const tbody = document.getElementById('historyTableBody');
+            if (history.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">暂无分析记录</td></tr>';
+                return;
+            }
+            tbody.innerHTML = history.map(item => `
+                <tr>
+                    <td><a href="${item.url}" target="_blank">${item.url.substring(0, 50)}...</a></td>
+                    <td><span class="score-badge score-${item.score >= 70 ? 'good' : item.score >= 40 ? 'mid' : 'bad'}">${item.score}</span></td>
+                    <td>${item.issues}</td>
+                    <td>${new Date(item.time).toLocaleString()}</td>
+                    <td><button class="btn-sm" onclick="viewDetail('${item.id}')">查看</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function viewDetail(id) {
+            const history = JSON.parse(localStorage.getItem('seoAnalysisHistory') || '[]');
+            const item = history.find(h => h.id === id);
+            if (item) {
+                document.getElementById('analyzeUrl').value = item.url;
+                analyzeWebsite();
+            }
+        }
+
+        loadHistory();
+    </script>
+</body>
+</html>
