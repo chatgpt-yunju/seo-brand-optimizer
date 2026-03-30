@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索引擎推送 - SEO品牌优化系统</title>
+    <meta name="description" content="主动推送网站URL到百度、360、搜狗等搜索引擎，加速收录">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>🚀 搜索引擎推送</h1>
+            <p class="subtitle">主动推送URL，加速搜索引擎收录</p>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="/">📊 SEO分析</a></li>
+                <li><a href="/submit.html" class="active">🚀 搜索引擎推送</a></li>
+                <li><a href="/backlinks.html">🔗 外链发布</a></li>
+                <li><a href="/meta-optimizer.html">⚙️ 元标签优化</a></li>
+                <li><a href="/sitemap-generator.html">🗺️ 网站地图</a></li>
+                <li><a href="/schema-generator.html">📋 结构化数据</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="container">
+            <!-- API配置 -->
+            <section class="card">
+                <h2>⚙️ API配置</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>百度搜索资源平台API Key</label>
+                        <input type="text" id="baiduApiKey" placeholder="请输入百度API密钥">
+                        <small>在百度搜索资源平台获取：<a href="https://ziyuan.baidu.com" target="_blank">ziyuan.baidu.com</a></small>
+                    </div>
+                    <div class="form-group">
+                        <label>360站长平台Token</label>
+                        <input type="text" id="360ApiToken" placeholder="请输入360站点Token">
+                        <small>在360站长平台获取</small>
+                    </div>
+                    <div class="form-group">
+                        <label>搜狗站长平台Token</label>
+                        <input type="text" id="sogouApiToken" placeholder="请输入搜狗站点Token">
+                        <small>在搜狗站长平台获取</small>
+                    </div>
+                    <div class="form-group">
+                        <label>神马站长平台Token</label>
+                        <input type="text" id="shenmaApiToken" placeholder="请输入神马站点Token">
+                        <small>在神马站长平台获取</small>
+                    </div>
+                </div>
+                <button onclick="saveApiConfig()" class="btn-primary">保存配置</button>
+            </section>
+
+            <!-- URL推送 -->
+            <section class="card">
+                <h2>📤 URL推送</h2>
+                <div class="input-group">
+                    <textarea id="urlList" rows="6" placeholder="每行一个URL，支持批量推送&#10;https://example.com/page1&#10;https://example.com/page2"></textarea>
+                </div>
+                <div class="btn-group">
+                    <button onclick="pushToBaidu()" class="btn-primary">推送到百度</button>
+                    <button onclick="pushTo360()" class="btn-orange">推送到360</button>
+                    <button onclick="pushToSogou()" class="btn-green">推送到搜狗</button>
+                    <button onclick="pushToShenma()" class="btn-blue">推送到神马</button>
+                    <button onclick="pushToAll()" class="btn-secondary">全部推送</button>
+                </div>
+            </section>
+
+            <!-- 推送结果 -->
+            <section class="card">
+                <h2>📊 推送结果</h2>
+                <div id="pushResult" class="result-area">
+                    <p class="empty-state">暂无推送记录</p>
+                </div>
+            </section>
+
+            <!-- 推送历史 -->
+            <section class="card">
+                <h2>📋 推送历史</h2>
+                <table class="data-table" id="pushHistoryTable">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>平台</th>
+                            <th>URL数量</th>
+                            <th>成功</th>
+                            <th>剩余</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pushHistoryBody">
+                        <tr><td colspan="6" class="empty-state">暂无推送记录</td></tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 SEO品牌优化系统</p>
+        </div>
+    </footer>
+
+    <script>
+        // 保存API配置
+        function saveApiConfig() {
+            const config = {
+                baiduApiKey: document.getElementById('baiduApiKey').value,
+                360ApiToken: document.getElementById('360ApiToken').value,
+                sogouApiToken: document.getElementById('sogouApiToken').value,
+                shenmaApiToken: document.getElementById('shenmaApiToken').value
+            };
+            localStorage.setItem('seoApiConfig', JSON.stringify(config));
+            alert('配置已保存！');
+        }
+
+        // 加载API配置
+        function loadApiConfig() {
+            const config = JSON.parse(localStorage.getItem('seoApiConfig') || '{}');
+            document.getElementById('baiduApiKey').value = config.baiduApiKey || '';
+            document.getElementById('360ApiToken').value = config['360ApiToken'] || '';
+            document.getElementById('sogouApiToken').value = config.sogouApiToken || '';
+            document.getElementById('shenmaApiToken').value = config.shenmaApiToken || '';
+        }
+
+        // 获取URL列表
+        function getUrlList() {
+            const text = document.getElementById('urlList').value;
+            return text.split('\n').filter(url => url.trim()).map(url => url.trim());
+        }
+
+        // 推送到百度
+        async function pushToBaidu() {
+            const urls = getUrlList();
+            if (urls.length === 0) {
+                alert('请输入要推送的URL');
+                return;
+            }
+
+            const apiKey = document.getElementById('baiduApiKey').value;
+            if (!apiKey) {
+                alert('请先配置百度API Key');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/push/baidu', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ apiKey, urls })
+                });
+                const result = await response.json();
+                showResult('百度', result);
+            } catch (err) {
+                showResult('百度', { success: false, message: err.message });
+            }
+        }
+
+        // 推送到360
+        async function pushTo360() {
+            const urls = getUrlList();
+            if (urls.length === 0) {
+                alert('请输入要推送的URL');
+                return;
+            }
+
+            const token = document.getElementById('360ApiToken').value;
+            if (!token) {
+                alert('请先配置360站点Token');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/push/360', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token, urls })
+                });
+                const result = await response.json();
+                showResult('360', result);
+            } catch (err) {
+                showResult('360', { success: false, message: err.message });
+            }
+        }
+
+        // 推送到搜狗
+        async function pushToSogou() {
+            const urls = getUrlList();
+            if (urls.length === 0) {
+                alert('请输入要推送的URL');
+                return;
+            }
+
+            const token = document.getElementById('sogouApiToken').value;
+            if (!token) {
+                alert('请先配置搜狗站点Token');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/push/sogou', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token, urls })
+                });
+                const result = await response.json();
+                showResult('搜狗', result);
+            } catch (err) {
+                showResult('搜狗', { success: false, message: err.message });
+            }
+        }
+
+        // 推送到神马
+        async function pushToShenma() {
+            const urls = getUrlList();
+            if (urls.length === 0) {
+                alert('请输入要推送的URL');
+                return;
+            }
+
+            const token = document.getElementById('shenmaApiToken').value;
+            if (!token) {
+                alert('请先配置神马站点Token');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/push/shenma', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token, urls })
+                });
+                const result = await response.json();
+                showResult('神马', result);
+            } catch (err) {
+                showResult('神马', { success: false, message: err.message });
+            }
+        }
+
+        // 全部推送
+        async function pushToAll() {
+            await pushToBaidu();
+            await pushTo360();
+            await pushToSogou();
+            await pushToShenma();
+        }
+
+        // 显示结果
+        function showResult(platform, result) {
+            const resultArea = document.getElementById('pushResult');
+            const success = result.success !== false;
+            resultArea.innerHTML = `
+                <div class="result-card ${success ? 'success' : 'error'}">
+                    <h4>${platform} 推送结果</h4>
+                    ${success ? `
+                        <p>✅ 成功推送: ${result.success_count || urls.length} 个URL</p>
+                        <p>📊 剩余配额: ${result.remain || '未知'}</p>
+                    ` : `
+                        <p>❌ 推送失败: ${result.message || '未知错误'}</p>
+                    `}
+                </div>
+            `;
+            savePushHistory(platform, getUrlList().length, success);
+        }
+
+        // 保存推送历史
+        function savePushHistory(platform, count, success) {
+            const history = JSON.parse(localStorage.getItem('pushHistory') || '[]');
+            history.unshift({
+                time: new Date().toISOString(),
+                platform,
+                count,
+                success: success ? count : 0,
+                remain: '未知',
+                status: success ? '成功' : '失败'
+            });
+            localStorage.setItem('pushHistory', JSON.stringify(history.slice(0, 50)));
+            loadPushHistory();
+        }
+
+        // 加载推送历史
+        function loadPushHistory() {
+            const history = JSON.parse(localStorage.getItem('pushHistory') || '[]');
+            const tbody = document.getElementById('pushHistoryBody');
+            if (history.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">暂无推送记录</td></tr>';
+                return;
+            }
+            tbody.innerHTML = history.map(item => `
+                <tr>
+                    <td>${new Date(item.time).toLocaleString()}</td>
+                    <td>${item.platform}</td>
+                    <td>${item.count}</td>
+                    <td>${item.success}</td>
+                    <td>${item.remain}</td>
+                    <td><span class="status-badge ${item.status === '成功' ? 'success' : 'error'}">${item.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        loadApiConfig();
+        loadPushHistory();
+    </script>
+</body>
+</html>

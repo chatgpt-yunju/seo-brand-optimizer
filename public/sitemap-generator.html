@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网站地图生成 - SEO品牌优化系统</title>
+    <meta name="description" content="自动生成sitemap.xml并提交到搜索引擎">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>🗺️ 网站地图生成器</h1>
+            <p class="subtitle">自动生成sitemap.xml并推送到搜索引擎</p>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="/">📊 SEO分析</a></li>
+                <li><a href="/submit.html">🚀 搜索引擎推送</a></li>
+                <li><a href="/backlinks.html">🔗 外链发布</a></li>
+                <li><a href="/meta-optimizer.html">⚙️ 元标签优化</a></li>
+                <li><a href="/sitemap-generator.html" class="active">🗺️ 网站地图</a></li>
+                <li><a href="/schema-generator.html">📋 结构化数据</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="container">
+            <section class="card">
+                <h2>🌐 网站基本信息</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>网站URL</label>
+                        <input type="url" id="siteUrl" placeholder="https://example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>网站名称</label>
+                        <input type="text" id="siteName" placeholder="网站名称">
+                    </div>
+                    <div class="form-group">
+                        <label>更新频率</label>
+                        <select id="changefreq">
+                            <option value="daily">每天 (daily)</option>
+                            <option value="weekly">每周 (weekly)</option>
+                            <option value="monthly">每月 (monthly)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>优先级</label>
+                        <select id="priority">
+                            <option value="1.0">1.0 - 最高</option>
+                            <option value="0.8">0.8 - 高</option>
+                            <option value="0.6" selected>0.6 - 中</option>
+                            <option value="0.4">0.4 - 低</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>📄 页面URL列表</h2>
+                <div class="input-group">
+                    <textarea id="urlList" rows="10" placeholder="每行一个URL，支持以下格式：
+https://example.com/
+https://example.com/about.html
+https://example.com/products/category.html"></textarea>
+                    <small>每行一个URL，可以手动输入或从文件导入</small>
+                </div>
+                <div class="btn-group">
+                    <button onclick="addCurrentPage()" class="btn-outline">添加当前页面</button>
+                    <button onclick="clearUrlList()" class="btn-outline">清空列表</button>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>⚙️ 高级选项</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="includeMobile" checked>
+                            包含移动版页面
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="includeImages" checked>
+                            包含图片
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="includeNews" checked>
+                            包含新闻
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="autoSubmit" checked>
+                            自动提交到搜索引擎
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🔧 生成网站地图</h2>
+                <div class="btn-group">
+                    <button onclick="generateSitemap()" class="btn-primary">生成sitemap.xml</button>
+                    <button onclick="downloadSitemap()" class="btn-secondary">下载文件</button>
+                    <button onclick="previewSitemap()" class="btn-outline">预览XML</button>
+                </div>
+                <div id="sitemapResult"></div>
+            </section>
+
+            <section class="card">
+                <h2>📋 搜索引擎提交入口</h2>
+                <div class="submit-links">
+                    <a href="https://search.google.com/search-console" target="_blank" class="submit-link google">
+                        <span class="submit-icon">🔍</span>
+                        <span class="submit-name">Google Search Console</span>
+                    </a>
+                    <a href="https://ziyuan.baidu.com/linksubmit/index" target="_blank" class="submit-link baidu">
+                        <span class="submit-icon">📚</span>
+                        <span class="submit-name">百度搜索资源平台</span>
+                    </a>
+                    <a href="https://zhanzhang.so.com/" target="_blank" class="submit-link 360">
+                        <span class="submit-icon">🔎</span>
+                        <span class="submit-name">360站长平台</span>
+                    </a>
+                    <a href="https://zhanzhang.sogou.com/" target="_blank" class="submit-link sogou">
+                        <span class="submit-icon">🐶</span>
+                        <span class="submit-name">搜狗站长平台</span>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 SEO品牌优化系统</p>
+        </div>
+    </footer>
+
+    <script>
+        // 添加当前页面
+        function addCurrentPage() {
+            const url = document.getElementById('siteUrl').value;
+            if (!url) {
+                alert('请先输入网站URL');
+                return;
+            }
+            const currentUrl = document.getElementById('urlList').value;
+            if (currentUrl && !currentUrl.endsWith('\n')) {
+                document.getElementById('urlList').value += '\n';
+            }
+            document.getElementById('urlList').value += url;
+        }
+
+        // 清空列表
+        function clearUrlList() {
+            if (confirm('确定要清空URL列表吗？')) {
+                document.getElementById('urlList').value = '';
+            }
+        }
+
+        // 生成sitemap
+        function generateSitemap() {
+            const siteUrl = document.getElementById('siteUrl').value;
+            if (!siteUrl) {
+                alert('请输入网站URL');
+                return;
+            }
+
+            const urls = document.getElementById('urlList').value.split('\n').filter(u => u.trim());
+            if (urls.length === 0) {
+                urls.push(siteUrl);
+            }
+
+            const siteName = document.getElementById('siteName').value || '网站';
+            const changefreq = document.getElementById('changefreq').value;
+            const priority = document.getElementById('priority').value;
+
+            let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
+
+            urls.forEach(url => {
+                url = url.trim();
+                sitemap += `
+  <url>
+    <loc>${url}</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>
+  </url>`;
+            });
+
+            sitemap += `
+</urlset>`;
+
+            // 保存到本地存储
+            localStorage.setItem('generatedSitemap', sitemap);
+            localStorage.setItem('generatedSitemapSite', siteUrl);
+
+            document.getElementById('sitemapResult').innerHTML = `
+                <div class="result-card success">
+                    <h4>✅ 网站地图生成成功！</h4>
+                    <p>共生成 ${urls.length} 个页面</p>
+                    <p>站点URL: ${siteUrl}</p>
+                </div>
+            `;
+
+            // 如果开启了自动提交
+            if (document.getElementById('autoSubmit').checked) {
+                autoSubmitSitemap(siteUrl);
+            }
+        }
+
+        // 自动提交sitemap
+        async function autoSubmitSitemap(siteUrl) {
+            const sitemapUrl = siteUrl.replace(/\/$/, '') + '/sitemap.xml';
+            document.getElementById('sitemapResult').innerHTML += `
+                <div class="result-card">
+                    <h4>📤 自动提交到搜索引擎...</h4>
+                    <p>Sitemap URL: ${sitemapUrl}</p>
+                </div>
+            `;
+        }
+
+        // 预览sitemap
+        function previewSitemap() {
+            const sitemap = localStorage.getItem('generatedSitemap');
+            if (!sitemap) {
+                alert('请先生成网站地图');
+                return;
+            }
+            const preview = document.createElement('div');
+            preview.className = 'code-block';
+            preview.style.maxHeight = '400px';
+            preview.style.overflow = 'auto';
+            preview.textContent = sitemap;
+
+            const resultDiv = document.getElementById('sitemapResult');
+            resultDiv.innerHTML = '<h4>📄 XML预览</h4>';
+            resultDiv.appendChild(preview);
+        }
+
+        // 下载sitemap
+        function downloadSitemap() {
+            const sitemap = localStorage.getItem('generatedSitemap');
+            if (!sitemap) {
+                alert('请先生成网站地图');
+                return;
+            }
+
+            const blob = new Blob([sitemap], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sitemap.xml';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

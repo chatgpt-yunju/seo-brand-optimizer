@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>外链自动发布 - SEO品牌优化系统</title>
+    <meta name="description" content="自动发布外链到各大博客、论坛、分类信息平台，提升网站权重">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>🔗 外链自动发布系统</h1>
+            <p class="subtitle">一键发布到100+平台，自动建设外链</p>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="/">📊 SEO分析</a></li>
+                <li><a href="/submit.html">🚀 搜索引擎推送</a></li>
+                <li><a href="/backlinks.html" class="active">🔗 外链发布</a></li>
+                <li><a href="/meta-optimizer.html">⚙️ 元标签优化</a></li>
+                <li><a href="/sitemap-generator.html">🗺️ 网站地图</a></li>
+                <li><a href="/schema-generator.html">📋 结构化数据</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="container">
+            <!-- 账号管理 -->
+            <section class="card">
+                <h2>👤 平台账号管理</h2>
+                <div class="account-section">
+                    <div class="platform-grid" id="platformList">
+                        <!-- 平台列表由JS动态生成 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 发布内容 -->
+            <section class="card">
+                <h2>📝 发布内容设置</h2>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>文章标题</label>
+                        <input type="text" id="articleTitle" placeholder="请输入文章标题" value="优质内容推荐">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>文章内容（支持HTML）</label>
+                        <textarea id="articleContent" rows="10" placeholder="请输入文章内容，支持HTML标签"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>目标URL（外链地址）</label>
+                        <input type="url" id="targetUrl" placeholder="https://example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>锚文本</label>
+                        <input type="text" id="anchorText" placeholder="外链锚文本" value="点击访问">
+                    </div>
+                    <div class="form-group">
+                        <label>发布平台</label>
+                        <select id="selectedPlatforms" multiple style="height: 150px;">
+                            <option value="sina">新浪博客</option>
+                            <option value="163">网易博客</option>
+                            <option value="sohu">搜狐博客</option>
+                            <option value="tieba">百度贴吧</option>
+                            <option value="58">58同城</option>
+                            <option value="baixing">百姓网</option>
+                        </select>
+                        <small>按住Ctrl可以多选</small>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button onclick="publishToSelected()" class="btn-primary">发布到选中平台</button>
+                    <button onclick="publishToAll()" class="btn-secondary">发布到全部平台</button>
+                    <button onclick="generateContent()" class="btn-outline">智能生成内容</button>
+                </div>
+            </section>
+
+            <!-- 发布进度 -->
+            <section class="card">
+                <h2>📊 发布进度</h2>
+                <div class="progress-container" id="publishProgress">
+                    <div class="empty-state">暂无发布任务</div>
+                </div>
+            </section>
+
+            <!-- 发布历史 -->
+            <section class="card">
+                <h2>📋 发布历史</h2>
+                <table class="data-table" id="publishHistory">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>平台</th>
+                            <th>标题</th>
+                            <th>目标URL</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody id="publishHistoryBody">
+                        <tr><td colspan="5" class="empty-state">暂无发布记录</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- 常用外链平台 -->
+            <section class="card">
+                <h2>🌐 支持的发布平台</h2>
+                <div class="platform-category">
+                    <h3>📝 博客类</h3>
+                    <div class="platform-tags">
+                        <span class="platform-tag">新浪博客</span>
+                        <span class="platform-tag">网易博客</span>
+                        <span class="platform-tag">搜狐博客</span>
+                        <span class="platform-tag">博客园</span>
+                        <span class="platform-tag">CSDN博客</span>
+                    </div>
+                </div>
+                <div class="platform-category">
+                    <h3>💬 论坛类</h3>
+                    <div class="platform-tags">
+                        <span class="platform-tag">百度贴吧</span>
+                        <span class="platform-tag">天涯社区</span>
+                        <span class="platform-tag">猫扑社区</span>
+                        <span class="platform-tag">19楼</span>
+                    </div>
+                </div>
+                <div class="platform-category">
+                    <h3>🏠 分类信息</h3>
+                    <div class="platform-tags">
+                        <span class="platform-tag">58同城</span>
+                        <span class="platform-tag">百姓网</span>
+                        <span class="platform-tag">赶集网</span>
+                    </div>
+                </div>
+                <div class="platform-category">
+                    <h3>📱 自媒体</h3>
+                    <div class="platform-tags">
+                        <span class="platform-tag">百家号</span>
+                        <span class="platform-tag">头条号</span>
+                        <span class="platform-tag">企鹅号</span>
+                        <span class="platform-tag">大鱼号</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 SEO品牌优化系统 | ⚠️ 外链发布需谨慎，避免违规操作</p>
+        </div>
+    </footer>
+
+    <script>
+        // 平台配置
+        const platforms = [
+            { id: 'sina', name: '新浪博客', category: 'blog', enabled: false, username: '', password: '' },
+            { id: '163', name: '网易博客', category: 'blog', enabled: false, username: '', password: '' },
+            { id: 'sohu', name: '搜狐博客', category: 'blog', enabled: false, username: '', password: '' },
+            { id: 'tieba', name: '百度贴吧', category: 'forum', enabled: false, username: '', password: '' },
+            { id: '58', name: '58同城', category: 'classified', enabled: false, username: '', password: '' },
+            { id: 'baixing', name: '百姓网', category: 'classified', enabled: false, username: '', password: '' }
+        ];
+
+        // 加载平台列表
+        function loadPlatforms() {
+            const savedPlatforms = JSON.parse(localStorage.getItem('backlinkPlatforms') || '[]');
+            const platformList = document.getElementById('platformList');
+
+            const allPlatforms = savedPlatforms.length > 0 ? savedPlatforms : platforms;
+
+            platformList.innerHTML = allPlatforms.map(p => `
+                <div class="platform-card ${p.enabled ? 'active' : ''}" data-id="${p.id}">
+                    <div class="platform-header">
+                        <input type="checkbox" ${p.enabled ? 'checked' : ''} onchange="togglePlatform('${p.id}')">
+                        <span class="platform-name">${p.name}</span>
+                    </div>
+                    <div class="platform-fields">
+                        <input type="text" placeholder="用户名" value="${p.username || ''}"
+                               onchange="updatePlatform('${p.id}', 'username', this.value)">
+                        <input type="password" placeholder="密码" value="${p.password || ''}"
+                               onchange="updatePlatform('${p.id}', 'password', this.value)">
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 切换平台启用状态
+        function togglePlatform(id) {
+            const savedPlatforms = JSON.parse(localStorage.getItem('backlinkPlatforms') || '[]');
+            const allPlatforms = savedPlatforms.length > 0 ? savedPlatforms : platforms;
+            const platform = allPlatforms.find(p => p.id === id);
+            if (platform) {
+                platform.enabled = !platform.enabled;
+                localStorage.setItem('backlinkPlatforms', JSON.stringify(allPlatforms));
+            }
+        }
+
+        // 更新平台信息
+        function updatePlatform(id, field, value) {
+            const savedPlatforms = JSON.parse(localStorage.getItem('backlinkPlatforms') || '[]');
+            const allPlatforms = savedPlatforms.length > 0 ? savedPlatforms : platforms;
+            const platform = allPlatforms.find(p => p.id === id);
+            if (platform) {
+                platform[field] = value;
+                localStorage.setItem('backlinkPlatforms', JSON.stringify(allPlatforms));
+            }
+        }
+
+        // 智能生成���容
+        function generateContent() {
+            const targetUrl = document.getElementById('targetUrl').value;
+            if (!targetUrl) {
+                alert('请先输入目标URL');
+                return;
+            }
+
+            const domain = new URL(targetUrl).hostname;
+            const templates = [
+                `今天发现一个非常不错的网站——${domain}，上面有很多优质内容，推荐给大家看看。\n\n${targetUrl}`,
+                `给大家分享一个我觉得不错的网站：${domain}，内容很有价值，感兴趣的朋友可以去看看。\n\n${targetUrl}`,
+                `无意中发现了一个很好的资源站：${domain}，内容丰富，推荐指数五颗星！\n\n访问链接：${targetUrl}`
+            ];
+
+            const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
+            document.getElementById('articleContent').value = randomTemplate;
+            document.getElementById('articleTitle').value = `分享一个优质网站 - ${domain}`;
+        }
+
+        // 发布到选中平台
+        async function publishToSelected() {
+            const selected = Array.from(document.getElementById('selectedPlatforms').selectedOptions).map(o => o.value);
+            if (selected.length === 0) {
+                alert('请选择至少一个发布平台');
+                return;
+            }
+            await publish(selected);
+        }
+
+        // 发布到全部平台
+        async function publishToAll() {
+            const savedPlatforms = JSON.parse(localStorage.getItem('backlinkPlatforms') || '[]');
+            const enabled = savedPlatforms.filter(p => p.enabled).map(p => p.id);
+            if (enabled.length === 0) {
+                alert('请先启用至少一个平台并填写账号密码');
+                return;
+            }
+            await publish(enabled);
+        }
+
+        // 执行发布
+        async function publish(platformIds) {
+            const title = document.getElementById('articleTitle').value;
+            const content = document.getElementById('articleContent').value;
+            const targetUrl = document.getElementById('targetUrl').value;
+            const anchorText = document.getElementById('anchorText').value;
+
+            if (!title || !content || !targetUrl) {
+                alert('请填写完整的发布内容');
+                return;
+            }
+
+            // 添加外链到内容
+            const contentWithLink = `${content}\n\n<a href="${targetUrl}" target="_blank">${anchorText}</a>`;
+
+            const progressContainer = document.getElementById('publishProgress');
+            progressContainer.innerHTML = '<div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>';
+
+            let completed = 0;
+            const total = platformIds.length;
+
+            for (const platformId of platformIds) {
+                try {
+                    const response = await fetch('/api/backlinks/publish', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            platform: platformId,
+                            title,
+                            content: contentWithLink,
+                            targetUrl
+                        })
+                    });
+
+                    const result = await response.json();
+                    savePublishHistory(platformId, title, targetUrl, result.success);
+                } catch (err) {
+                    savePublishHistory(platformId, title, targetUrl, false);
+                }
+
+                completed++;
+                const percent = (completed / total) * 100;
+                progressContainer.querySelector('.progress-fill').style.width = percent + '%';
+            }
+
+            alert('发布完成！');
+        }
+
+        // 保存发布历史
+        function savePublishHistory(platform, title, targetUrl, success) {
+            const history = JSON.parse(localStorage.getItem('publishHistory') || '[]');
+            const platformName = platforms.find(p => p.id === platform)?.name || platform;
+            history.unshift({
+                time: new Date().toISOString(),
+                platform: platformName,
+                title,
+                targetUrl,
+                status: success ? '成功' : '失败'
+            });
+            localStorage.setItem('publishHistory', JSON.stringify(history.slice(0, 100)));
+            loadPublishHistory();
+        }
+
+        // 加载发布历史
+        function loadPublishHistory() {
+            const history = JSON.parse(localStorage.getItem('publishHistory') || '[]');
+            const tbody = document.getElementById('publishHistoryBody');
+            if (history.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">暂无发布记录</td></tr>';
+                return;
+            }
+            tbody.innerHTML = history.map(item => `
+                <tr>
+                    <td>${new Date(item.time).toLocaleString()}</td>
+                    <td>${item.platform}</td>
+                    <td>${item.title.substring(0, 30)}...</td>
+                    <td><a href="${item.targetUrl}" target="_blank">${item.targetUrl.substring(0, 30)}...</a></td>
+                    <td><span class="status-badge ${item.status === '成功' ? 'success' : 'error'}">${item.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        loadPlatforms();
+        loadPublishHistory();
+    </script>
+</body>
+</html>

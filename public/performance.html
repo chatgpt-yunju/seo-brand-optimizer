@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>性能优化 - SEO品牌优化系统</title>
+    <meta name="description" content="检测Core Web Vitals，优化页面加载速度">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>⚡ 性能优化工具</h1>
+            <p class="subtitle">Core Web Vitals 检测与优化建议</p>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="/">📊 SEO分析</a></li>
+                <li><a href="/submit.html">🚀 搜索引擎推送</a></li>
+                <li><a href="/backlinks.html">🔗 外链发布</a></li>
+                <li><a href="/meta-optimizer.html">⚙️ 元标签优化</a></li>
+                <li><a href="/sitemap-generator.html">🗺️ 网站地图</a></li>
+                <li><a href="/performance.html" class="active">⚡ 性能优化</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="container">
+            <section class="card">
+                <h2>🔍 输入要检测的URL</h2>
+                <div class="input-group">
+                    <input type="url" id="perfUrl" placeholder="https://example.com" required>
+                    <button onclick="analyzePerformance()" class="btn-primary">开始分析</button>
+                </div>
+            </section>
+
+            <section class="card" id="perfResults" style="display: none;">
+                <h2>📊 Core Web Vitals 检测结果</h2>
+                <div class="cwv-grid">
+                    <div class="cwv-card" id="lcpCard">
+                        <div class="cwv-icon">🚀</div>
+                        <div class="cwv-name">LCP</div>
+                        <div class="cwv-full">最大内容绘制</div>
+                        <div class="cwv-value">--</div>
+                        <div class="cwv-status">待检测</div>
+                    </div>
+                    <div class="cwv-card" id="fidCard">
+                        <div class="cwv-icon">👆</div>
+                        <div class="cwv-name">FID</div>
+                        <div class="cwv-full">首次输入延迟</div>
+                        <div class="cwv-value">--</div>
+                        <div class="cwv-status">待检测</div>
+                    </div>
+                    <div class="cwv-card" id="clsCard">
+                        <div class="cwv-icon">📐</div>
+                        <div class="cwv-name">CLS</div>
+                        <div class="cwv-full">累积布局偏移</div>
+                        <div class="cwv-value">--</div>
+                        <div class="cwv-status">待检测</div>
+                    </div>
+                    <div class="cwv-card" id="fcpCard">
+                        <div class="cwv-icon">🎨</div>
+                        <div class="cwv-name">FCP</div>
+                        <div class="cwv-full">首次内容绘制</div>
+                        <div class="cwv-value">--</div>
+                        <div class="cwv-status">待检测</div>
+                    </div>
+                    <div class="cwv-card" id="ttiCard">
+                        <div class="cwv-icon">⏱️</div>
+                        <div class="cwv-name">TTI</div>
+                        <div class="cwv-full">可交互时间</div>
+                        <div class="cwv-value">--</div>
+                        <div class="cwv-status">待检测</div>
+                    </div>
+                    <div class="cwv-card" id="speedCard">
+                        <div class="cwv-icon">📶</div>
+                        <div class="cwv-name">Speed</div>
+                        <div class="cwv-full">综合速度评分</div>
+                        <div class="cwv-value">--</div>
+                        <div class="cwv-status">待检测</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card" id="perfSuggestions" style="display: none;">
+                <h2>💡 优化建议</h2>
+                <div id="suggestionsList"></div>
+            </section>
+
+            <section class="card">
+                <h2>📈 性能优化知识</h2>
+                <div class="info-cards">
+                    <div class="info-card">
+                        <h3>🚀 LCP (最大内容绘制)</h3>
+                        <p>测量页面主要内容的加载速度。良好的LCP应在2.5秒以内。</p>
+                        <ul>
+                            <li>优化服务器响应时间</li>
+                            <li>使用CDN加速</li>
+                            <li>优化图片大小和格式</li>
+                            <li>预加载关键资源</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <h3>👆 FID (首次输入延迟)</h3>
+                        <p>用户首次与页面交互到浏览器响应的延迟。良好的FID应在100毫秒以内。</p>
+                        <ul>
+                            <li>减少JavaScript执行时间</li>
+                            <li>拆分长任务</li>
+                            <li>使用requestIdleCallback</li>
+                            <li>延迟加载非关键JS</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <h3>📐 CLS (累积布局偏移)</h3>
+                        <p>测量页面视觉稳定性。良好的CLS应在0.1以内。</p>
+                        <ul>
+                            <li>为图片和视频设置尺寸</li>
+                            <li>预留广告位空间</li>
+                            <li>使用字体加载优化</li>
+                            <li>避免动态插入内容</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 SEO品牌优化系统</p>
+        </div>
+    </footer>
+
+    <script>
+        async function analyzePerformance() {
+            const url = document.getElementById('perfUrl').value;
+            if (!url) {
+                alert('请输入要分析的URL');
+                return;
+            }
+
+            document.getElementById('perfResults').style.display = 'block';
+            document.getElementById('perfSuggestions').style.display = 'block';
+
+            // 模拟性能分析（实际应该调用后端API）
+            const metrics = [
+                { id: 'lcp', name: 'LCP', value: Math.random() * 3 + 1, unit: 's', good: 2.5, poor: 4.0 },
+                { id: 'fid', name: 'FID', value: Math.random() * 150 + 20, unit: 'ms', good: 100, poor: 300 },
+                { id: 'cls', name: 'CLS', value: Math.random() * 0.2, unit: '', good: 0.1, poor: 0.25 },
+                { id: 'fcp', name: 'FCP', value: Math.random() * 2 + 0.5, unit: 's', good: 1.8, poor: 3.0 },
+                { id: 'tti', name: 'TTI', value: Math.random() * 3 + 1, unit: 's', good: 3.8, poor: 7.3 },
+                { id: 'speed', name: 'Speed', value: Math.floor(Math.random() * 40 + 60), unit: '', good: 90, poor: 50 }
+            ];
+
+            const suggestions = [];
+
+            metrics.forEach(metric => {
+                const card = document.getElementById(`${metric.id}Card`);
+                const valueEl = card.querySelector('.cwv-value');
+                const statusEl = card.querySelector('.cwv-status');
+
+                let value, status, statusClass;
+
+                if (metric.id === 'speed') {
+                    value = metric.value;
+                    status = value >= metric.good ? '优秀' : value >= metric.poor ? '需要改进' : '较差';
+                    statusClass = value >= metric.good ? 'good' : value >= metric.poor ? 'mid' : 'bad';
+                } else {
+                    value = metric.value.toFixed(1) + metric.unit;
+                    status = metric.value <= metric.good ? '良好' : metric.value <= metric.poor ? '需要改进' : '较差';
+                    statusClass = metric.value <= metric.good ? 'good' : metric.value <= metric.poor ? 'mid' : 'bad';
+                }
+
+                valueEl.textContent = value;
+                statusEl.textContent = status;
+                statusEl.className = `cwv-status ${statusClass}`;
+
+                if (statusClass !== 'good') {
+                    suggestions.push({ metric: metric.name, status, value });
+                }
+            });
+
+            // 显示优化建议
+            const suggestionsList = document.getElementById('suggestionsList');
+            if (suggestions.length === 0) {
+                suggestionsList.innerHTML = '<div class="result-card success">🎉 恭喜！您的网站性能非常好！</div>';
+            } else {
+                suggestionsList.innerHTML = suggestions.map(s => `
+                    <div class="result-card warning">
+                        <h4>⚠️ ${s.metric}: ${s.status}</h4>
+                        <p>当前值: ${typeof s.value === 'number' ? s.value.toFixed(1) : s.value}</p>
+                    </div>
+                `).join('');
+            }
+        }
+    </script>
+</body>
+</html>
