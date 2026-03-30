@@ -46,21 +46,18 @@
 - 关键词密度分析
 - 优化建议
 
-## 快速开始
+## 在线访问
 
-### 1. 安装依赖
+### GitHub Pages（推荐）
+直接访问：https://chatgpt-yunju.github.io/seo-brand-optimizer/
+
+### 本地运行
 ```bash
 cd seo-brand-optimizer
 npm install
-```
-
-### 2. 启动服务
-```bash
 npm start
 ```
-
-### 3. 访问系统
-打开浏览器访问 http://localhost:3000
+然后访问 http://localhost:3000
 
 ## 搜索引擎推送配置
 
