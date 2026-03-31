@@ -6,6 +6,8 @@
     <title>搜索引擎推送 - SEO品牌优化系统</title>
     <meta name="description" content="主动推送网站URL到百度、360、搜狗等搜索引擎，加速收录">
     <link rel="stylesheet" href="/css/style.css">
+    <!-- API 配置 -->
+    <script src="/js/api-config.js"></script>
 </head>
 <body>
     <header class="header">
@@ -152,7 +154,8 @@
             }
 
             try {
-                const response = await fetch('/api/push/baidu', {
+                const apiUrl = window.getApiUrl ? window.getApiUrl('/api/push/baidu') : '/api/push/baidu';
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ apiKey, urls })
@@ -179,7 +182,8 @@
             }
 
             try {
-                const response = await fetch('/api/push/360', {
+                const apiUrl = window.getApiUrl ? window.getApiUrl('/api/push/360') : '/api/push/360';
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ token, urls })
@@ -206,7 +210,8 @@
             }
 
             try {
-                const response = await fetch('/api/push/sogou', {
+                const apiUrl = window.getApiUrl ? window.getApiUrl('/api/push/sogou') : '/api/push/sogou';
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ token, urls })
@@ -233,7 +238,8 @@
             }
 
             try {
-                const response = await fetch('/api/push/shenma', {
+                const apiUrl = window.getApiUrl ? window.getApiUrl('/api/push/shenma') : '/api/push/shenma';
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ token, urls })

@@ -23,7 +23,8 @@ async function analyzeWebsite() {
     resultDiv.innerHTML = '<div class="result-card">🔍 正在分析...</div>';
 
     try {
-        const response = await fetch('/api/analyze', {
+        const apiUrl = window.getApiUrl ? window.getApiUrl('/api/analyze') : '/api/analyze';
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ url })

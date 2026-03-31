@@ -307,14 +307,16 @@ app.post('/api/performance/check', async (req, res) => {
     });
 });
 
-// 启动服务器
-app.listen(PORT, () => {
-    console.log(`
+// 只在直接运行时启动服务器（本地开发环境）
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`
 ╔═══════════════════════════════════════════╗
 ║   SEO品牌优化系统 已启动                    ║
 ║   访问地址: http://localhost:${PORT}         ║
 ╚═══════════════════════════════════════════╝
-    `);
-});
+        `);
+    });
+}
 
 module.exports = app;
