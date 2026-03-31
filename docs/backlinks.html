@@ -6,6 +6,8 @@
     <title>外链自动发布 - SEO品牌优化系统</title>
     <meta name="description" content="自动发布外链到各大博客、论坛、分类信息平台，提升网站权重">
     <link rel="stylesheet" href="/css/style.css">
+    <!-- API 配置 -->
+    <script src="/js/api-config.js"></script>
 </head>
 <body>
     <header class="header">
@@ -276,7 +278,8 @@
 
             for (const platformId of platformIds) {
                 try {
-                    const response = await fetch('/api/backlinks/publish', {
+                    const apiUrl = window.getApiUrl ? window.getApiUrl('/api/backlinks/publish') : '/api/backlinks/publish';
+                    const response = await fetch(apiUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
