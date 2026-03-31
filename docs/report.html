@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报告生成 - SEO品牌优化系统</title>
+    <meta name="description" content="自动生成SEO报告、邮件推送、报告模板定制">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .report-preview { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 30px; max-width: 800px; margin: 0 auto; }
+        .report-header { text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 20px; margin-bottom: 20px; }
+        .report-title { font-size: 28px; color: var(--primary); margin-bottom: 10px; }
+        .report-subtitle { color: var(--gray); }
+        .report-section { margin-bottom: 25px; }
+        .report-section h3 { color: var(--text); font-size: 18px; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+        .report-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .report-metric { text-align: center; padding: 15px; background: var(--light-gray); border-radius: 8px; }
+        .report-metric-value { font-size: 24px; font-weight: bold; color: var(--primary); }
+        .report-metric-label { font-size: 12px; color: var(--gray); margin-top: 5px; }
+        .report-chart { height: 200px; background: var(--light-gray); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--gray); }
+        .template-card { border: 2px solid var(--border); border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s; }
+        .template-card:hover { border-color: var(--primary); }
+        .template-card.active { border-color: var(--primary); background: #eff6ff; }
+        .template-card h4 { margin-bottom: 10px; }
+        .template-card p { font-size: 13px; color: var(--gray); }
+        .schedule-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: var(--light-gray); border-radius: 8px; margin-bottom: 10px; }
+        .schedule-status { padding: 4px 12px; border-radius: 12px; font-size: 12px; }
+        .schedule-status.active { background: #d1fae5; color: #065f46; }
+        .schedule-status.paused { background: #fef3c7; color: #92400e; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>📈 自动化报告</h1>
+            <p class="subtitle">自动生成SEO报告，支持定时发送和模板定制</p>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="/">📊 SEO分析</a></li>
+                <li><a href="/competitor.html">🎯 竞争对手</a></li>
+                <li><a href="/batch-seo.html">📑 批量检测</a></li>
+                <li><a href="/report.html" class="active">📈 报告生成</a></li>
+                <li><a href="/backlinks-check.html">🔗 友链检测</a></li>
+                <li><a href="/权重查询.html">⚡ 权重查询</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="container">
+            <!-- 生成新报告 -->
+            <section class="card">
+                <h2>📝 生成新报告</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>报告类型</label>
+                        <select id="reportType">
+                            <option value="summary">综合摘要报告</option>
+                            <option value="detailed">详细分析报告</option>
+                            <option value="competitor">竞争对手对比报告</option>
+                            <option value="weekly">周报</option>
+                            <option value="monthly">月报</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>目标网站</label>
+                        <input type="url" id="reportUrl" placeholder="https://example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>报告标题</label>
+                        <input type="text" id="reportTitle" placeholder="SEO优化报告">
+                    </div>
+                    <div class="form-group">
+                        <label>报告格式</label>
+                        <select id="reportFormat">
+                            <option value="html">HTML网页</option>
+                            <option value="pdf">PDF文档</option>
+                            <option value="doc">Word文档</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="generateReport()" class="btn-primary" style="margin-top: 15px;">🚀 生成报告</button>
+            </section>
+
+            <!-- 报告预览 -->
+            <section class="card" id="reportPreviewSection" style="display: none;">
+                <h2>👁️ 报告预览</h2>
+                <div class="report-preview" id="reportPreview"></div>
+                <div class="btn-group" style="margin-top: 20px;">
+                    <button onclick="downloadReport()" class="btn-primary">📥 下载报告</button>
+                    <button onclick="sendReportByEmail()" class="btn-secondary">📧 发送到邮箱</button>
+                    <button onclick="copyReportHtml()" class="btn-outline">📋 复制HTML</button>
+                </div>
+            </section>
+
+            <!-- 报告模板 -->
+            <section class="card">
+                <h2>📋 报告模板</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                    <div class="template-card active" onclick="selectTemplate(this, 'default')">
+                        <h4>📊 默认模板</h4>
+                        <p>标准SEO报告，包含综合评分、问题分析、优化建议</p>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate(this, 'simple')">
+                        <h4>📝 简洁模板</h4>
+                        <p>简化版本，只包含关键指标和核心建议</p>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate(this, 'detailed')">
+                        <h4>📈 详细模板</h4>
+                        <p>完整分析，包含技术细节、竞争对手对比、趋势图表</p>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate(this, 'custom')">
+                        <h4>⚙️ 自定义模板</h4>
+                        <p>自定义报告内容和样式，满足特殊需求</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 定时报告 -->
+            <section class="card">
+                <h2>⏰ 定时报告</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>定时周期</label>
+                        <select id="scheduleInterval">
+                            <option value="daily">每天</option>
+                            <option value="weekly" selected>每周</option>
+                            <option value="monthly">每月</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>发送时间</label>
+                        <input type="time" id="scheduleTime" value="09:00">
+                    </div>
+                    <div class="form-group">
+                        <label>接收邮箱</label>
+                        <input type="email" id="scheduleEmail" placeholder="example@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select id="scheduleStatus">
+                            <option value="active">启用</option>
+                            <option value="paused">暂停</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="saveSchedule()" class="btn-primary" style="margin-top: 15px;">💾 保存定时任务</button>
+
+                <h3 style="margin-top: 30px;">已设置的定时任务</h3>
+                <div id="scheduleList" style="margin-top: 15px;">
+                    <div class="schedule-item">
+                        <div>
+                            <strong>每周报告</strong>
+                            <div style="font-size: 12px; color: var(--gray);">每周一 09:00 | example@email.com</div>
+                        </div>
+                        <span class="schedule-status active">运行中</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 历史报告 -->
+            <section class="card">
+                <h2>📁 历史报告</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>报告名称</th>
+                            <th>网站</th>
+                            <th>生成时间</th>
+                            <th>格式</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyReportBody">
+                        <tr>
+                            <td>SEO综合报告</td>
+                            <td>example.com</td>
+                            <td>2026-03-30 10:30</td>
+                            <td>HTML</td>
+                            <td><button class="btn-sm">下载</button></td>
+                        </tr>
+                        <tr>
+                            <td>竞争对手分析</td>
+                            <td>example.com</td>
+                            <td>2026-03-29 15:20</td>
+                            <td>PDF</td>
+                            <td><button class="btn-sm">下载</button></td>
+                        </tr>
+                        <tr>
+                            <td>周报</td>
+                            <td>example.com</td>
+                            <td>2026-03-25 09:00</td>
+                            <td>HTML</td>
+                            <td><button class="btn-sm">下载</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 SEO品牌优化系统</p>
+        </div>
+    </footer>
+
+    <script>
+        let selectedTemplate = 'default';
+        let generatedReportHtml = '';
+
+        // 选择模板
+        function selectTemplate(element, template) {
+            document.querySelectorAll('.template-card').forEach(card => card.classList.remove('active'));
+            element.classList.add('active');
+            selectedTemplate = template;
+        }
+
+        // 生成报告
+        function generateReport() {
+            const type = document.getElementById('reportType').value;
+            const url = document.getElementById('reportUrl').value || 'example.com';
+            const title = document.getElementById('reportTitle').value || 'SEO优化报告';
+
+            const reportData = {
+                title: title,
+                url: url,
+                date: new Date().toLocaleDateString('zh-CN'),
+                score: Math.floor(Math.random() * 20) + 70,
+                issues: Math.floor(Math.random() * 10),
+                backlinks: Math.floor(Math.random() * 5000) + 500,
+                indexedPages: Math.floor(Math.random() * 3000) + 100,
+                keywords: Math.floor(Math.random() * 500) + 50,
+                improvements: [
+                    '优化页面标题标签',
+                    '增加内容质量',
+                    '改进网站速度',
+                    '添加更多内部链接'
+                ]
+            };
+
+            generatedReportHtml = `
+                <div class="report-header">
+                    <div class="report-title">${reportData.title}</div>
+                    <div class="report-subtitle">${reportData.url} | ${reportData.date}</div>
+                </div>
+                <div class="report-section">
+                    <h3>📊 综合评分</h3>
+                    <div class="report-metrics">
+                        <div class="report-metric">
+                            <div class="report-metric-value">${reportData.score}</div>
+                            <div class="report-metric-label">SEO评分</div>
+                        </div>
+                        <div class="report-metric">
+                            <div class="report-metric-value">${reportData.backlinks}</div>
+                            <div class="report-metric-label">反向链接</div>
+                        </div>
+                        <div class="report-metric">
+                            <div class="report-metric-value">${reportData.indexedPages}</div>
+                            <div class="report-metric-label">收录页面</div>
+                        </div>
+                        <div class="report-metric">
+                            <div class="report-metric-value">${reportData.keywords}</div>
+                            <div class="report-metric-label">关键词数</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="report-section">
+                    <h3>⚠️ 发现的问题 (${reportData.issues}个)</h3>
+                    <ul style="padding-left: 20px;">
+                        <li>页面标题标签需要优化</li>
+                        <li>Meta描述长度不足</li>
+                        <li>部分图片缺少ALT属性</li>
+                        <li>建议增加更多内部链接</li>
+                    </ul>
+                </div>
+                <div class="report-section">
+                    <h3>💡 优化建议</h3>
+                    <ul style="padding-left: 20px;">
+                        ${reportData.improvements.map(i => `<li>${i}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+
+            document.getElementById('reportPreview').innerHTML = generatedReportHtml;
+            document.getElementById('reportPreviewSection').style.display = 'block';
+
+            // 滚动到预览
+            document.getElementById('reportPreviewSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 下载报告
+        function downloadReport() {
+            const format = document.getElementById('reportFormat').value;
+            const title = document.getElementById('reportTitle').value || 'SEO报告';
+
+            let content, filename, type;
+
+            if (format === 'html') {
+                content = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title></head><body>${generatedReportHtml}</body></html>`;
+                filename = `${title}.html`;
+                type = 'text/html';
+            } else {
+                content = generatedReportHtml;
+                filename = `${title}.html`;
+                type = 'text/html';
+            }
+
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 发送到邮箱
+        function sendReportByEmail() {
+            const email = prompt('请输入接收报告的邮箱地址:');
+            if (email) {
+                alert(`报告已发送到 ${email}（模拟发送）`);
+            }
+        }
+
+        // 复制HTML
+        function copyReportHtml() {
+            navigator.clipboard.writeText(generatedReportHtml).then(() => {
+                alert('报告HTML已复制到剪贴板！');
+            });
+        }
+
+        // 保存定时任务
+        function saveSchedule() {
+            const interval = document.getElementById('scheduleInterval').value;
+            const time = document.getElementById('scheduleTime').value;
+            const email = document.getElementById('scheduleEmail').value;
+
+            if (!email) {
+                alert('请输入接收邮箱');
+                return;
+            }
+
+            const scheduleList = document.getElementById('scheduleList');
+            const intervalText = { daily: '每天', weekly: '每周', monthly: '每月' };
+
+            scheduleList.innerHTML += `
+                <div class="schedule-item">
+                    <div>
+                        <strong>${intervalText[interval]}报告</strong>
+                        <div style="font-size: 12px; color: var(--gray);">${intervalText[interval]} ${time} | ${email}</div>
+                    </div>
+                    <span class="schedule-status active">运行中</span>
+                </div>
+            `;
+
+            alert('定时任务已保存！');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>批量SEO检测 - SEO品牌优化系统</title>
+    <meta name="description" content="批量URL检测、关键词分析、元标签检查">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .batch-progress { margin: 20px 0; }
+        .batch-progress-bar { height: 20px; background: var(--light-gray); border-radius: 10px; overflow: hidden; }
+        .batch-progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--success)); transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; }
+        .batch-results { margin-top: 20px; }
+        .batch-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: var(--light-gray); border-radius: 8px; margin-bottom: 10px; transition: all 0.3s; }
+        .batch-item:hover { background: var(--white); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .batch-item-url { font-weight: 500; color: var(--primary); }
+        .batch-item-status { display: flex; align-items: center; gap: 10px; }
+        .batch-item-score { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .batch-item-score.good { background: #d1fae5; color: #065f46; }
+        .batch-item-score.mid { background: #fef3c7; color: #92400e; }
+        .batch-item-score.bad { background: #fee2e2; color: #991b1b; }
+        .batch-item-actions { display: flex; gap: 8px; }
+        .issue-list { margin-top: 10px; padding-left: 20px; font-size: 13px; color: var(--gray); }
+        .issue-list li { margin-bottom: 5px; }
+        .export-btns { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>📑 批量SEO检测</h1>
+            <p class="subtitle">批量检测多个URL的SEO状况，一键导出报告</p>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="/">📊 SEO分析</a></li>
+                <li><a href="/competitor.html">🎯 竞争对手</a></li>
+                <li><a href="/batch-seo.html" class="active">📑 批量检测</a></li>
+                <li><a href="/report.html">📈 报告生成</a></li>
+                <li><a href="/backlinks-check.html">🔗 友链检测</a></li>
+                <li><a href="/权重查询.html">⚡ 权重查询</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="container">
+            <!-- 批量URL输入 -->
+            <section class="card">
+                <h2>🌐 批量URL输入</h2>
+                <div class="input-group">
+                    <textarea id="batchUrls" rows="8" placeholder="每行输入��个URL，支持批量检测：
+https://example.com
+https://example.com/page1.html
+https://example.com/page2.html"></textarea>
+                </div>
+                <div class="btn-group">
+                    <button onclick="startBatchAnalysis()" class="btn-primary">🚀 开始批量检测</button>
+                    <button onclick="loadSampleUrls()" class="btn-outline">加载示例URL</button>
+                    <button onclick="clearBatchUrls()" class="btn-outline">清空列表</button>
+                </div>
+            </section>
+
+            <!-- 检测进度 -->
+            <section class="card" id="batchProgressSection" style="display: none;">
+                <h2>⏳ 检测进度</h2>
+                <div class="batch-progress">
+                    <div class="batch-progress-bar">
+                        <div class="batch-progress-fill" id="batchProgressBar" style="width: 0%">0%</div>
+                    </div>
+                </div>
+                <p id="batchProgressText">正在检测...</p>
+            </section>
+
+            <!-- 检测结果 -->
+            <section class="card" id="batchResultsSection" style="display: none;">
+                <h2>📊 检测结果</h2>
+                <div style="display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalUrls">0</div>
+                        <div class="stat-label">总URL数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="goodCount" style="color: var(--success);">0</div>
+                        <div class="stat-label">优秀</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="midCount" style="color: var(--warning);">0</div>
+                        <div class="stat-label">一般</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="badCount" style="color: var(--danger);">0</div>
+                        <div class="stat-label">较差</div>
+                    </div>
+                </div>
+                <div class="batch-results" id="batchResults"></div>
+                <div class="export-btns">
+                    <button onclick="exportToCSV()" class="btn-secondary">📥 导出CSV</button>
+                    <button onclick="exportToJSON()" class="btn-secondary">📥 导出JSON</button>
+                    <button onclick="exportToExcel()" class="btn-secondary">📥 导出Excel</button>
+                </div>
+            </section>
+
+            <!-- 批量关键词分析 -->
+            <section class="card">
+                <h2>🔑 批量关键词分析</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>输入关键词（每行一个）</label>
+                        <textarea id="batchKeywords" rows="6" placeholder="SEO优化
+网站推广
+品牌营销
+内容为王
+外链建设"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>分析选项</label>
+                        <div style="display: flex; flex-direction: column; gap: 10px; padding: 15px; background: var(--light-gray); border-radius: 8px;">
+                            <label><input type="checkbox" id="analyzeVolume" checked> 搜索量分析</label>
+                            <label><input type="checkbox" id="analyzeCompetition" checked> 竞争度分析</label>
+                            <label><input type="checkbox" id="analyzeTrend" checked> 趋势分析</label>
+                            <label><input type="checkbox" id="analyzeRelated" checked> 相关关键词</label>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="analyzeBatchKeywords()" class="btn-primary" style="margin-top: 15px;">开始分析</button>
+                <div id="keywordAnalysisResult" style="margin-top: 20px;"></div>
+            </section>
+
+            <!-- 批量元标签检查 -->
+            <section class="card">
+                <h2>🏷️ 批量元标签检查</h2>
+                <div class="input-group">
+                    <textarea id="metaCheckUrls" rows="5" placeholder="输入要检查元标签的URL（每行一个）"></textarea>
+                </div>
+                <button onclick="checkMetaTags()" class="btn-primary" style="margin-top: 15px;">检查元标签</button>
+                <div id="metaCheckResult" style="margin-top: 20px;"></div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 SEO品牌优化系统</p>
+        </div>
+    </footer>
+
+    <script>
+        let batchResults = [];
+
+        // 加载示例URL
+        function loadSampleUrls() {
+            document.getElementById('batchUrls').value = `https://example.com
+https://example.com/about.html
+https://example.com/products.html
+https://example.com/contact.html
+https://example.com/blog/seo-tips.html`;
+        }
+
+        // 清空列表
+        function clearBatchUrls() {
+            if (confirm('确定要清空所有URL吗？')) {
+                document.getElementById('batchUrls').value = '';
+            }
+        }
+
+        // 开始批量检测
+        async function startBatchAnalysis() {
+            const urlText = document.getElementById('batchUrls').value;
+            const urls = urlText.split('\n').map(u => u.trim()).filter(u => u);
+
+            if (urls.length === 0) {
+                alert('请输入要检测的URL');
+                return;
+            }
+
+            // 显示进度
+            document.getElementById('batchProgressSection').style.display = 'block';
+            document.getElementById('batchResultsSection').style.display = 'none';
+
+            batchResults = [];
+            const progressBar = document.getElementById('batchProgressBar');
+            const progressText = document.getElementById('batchProgressText');
+
+            for (let i = 0; i < urls.length; i++) {
+                const url = urls[i];
+                try {
+                    const result = await analyzeUrl(url);
+                    batchResults.push(result);
+                } catch (e) {
+                    batchResults.push({
+                        url: url,
+                        score: 0,
+                        status: 'error',
+                        message: e.message
+                    });
+                }
+
+                // 更新进度
+                const percent = ((i + 1) / urls.length) * 100;
+                progressBar.style.width = percent + '%';
+                progressBar.textContent = Math.round(percent) + '%';
+                progressText.textContent = `正在检测: ${url}`;
+
+                // 模拟延迟
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            progressText.textContent = '检测完成！';
+            displayBatchResults();
+        }
+
+        // 分析单个URL
+        async function analyzeUrl(url) {
+            // 模拟API调用
+            await new Promise(resolve => setTimeout(resolve, 300));
+
+            const score = Math.floor(Math.random() * 40) + 60;
+            const issues = [];
+
+            if (score < 70) issues.push('标题标签需优化');
+            if (score < 75) issues.push('Meta描述不够完善');
+            if (score < 80) issues.push('建议添加更多内链');
+            if (score < 85) issues.push('图片ALT属性缺失');
+
+            return {
+                url: url,
+                score: score,
+                status: score >= 80 ? 'good' : score >= 65 ? 'mid' : 'bad',
+                title: score > 70 ? '正常' : '需要优化',
+                description: score > 75 ? '正常' : '缺失或过短',
+                h1: score > 80 ? '正常' : '缺失',
+                images: score > 75 ? '正常' : '部分缺失ALT',
+                links: score > 70 ? '正常' : '数量偏少',
+                issues: issues,
+                analyzedAt: new Date().toISOString()
+            };
+        }
+
+        // 显示批量结果
+        function displayBatchResults() {
+            document.getElementById('batchProgressSection').style.display = 'none';
+            document.getElementById('batchResultsSection').style.display = 'block';
+
+            // 统计
+            const good = batchResults.filter(r => r.status === 'good').length;
+            const mid = batchResults.filter(r => r.status === 'mid').length;
+            const bad = batchResults.filter(r => r.status === 'bad' || r.status === 'error').length;
+
+            document.getElementById('totalUrls').textContent = batchResults.length;
+            document.getElementById('goodCount').textContent = good;
+            document.getElementById('midCount').textContent = mid;
+            document.getElementById('badCount').textContent = bad;
+
+            // 渲染结果列表
+            const resultsDiv = document.getElementById('batchResults');
+            resultsDiv.innerHTML = batchResults.map((r, i) => `
+                <div class="batch-item">
+                    <div>
+                        <div class="batch-item-url">${r.url}</div>
+                        ${r.issues.length > 0 ? `<ul class="issue-list">${r.issues.map(i => `<li>⚠️ ${i}</li>`).join('')}</ul>` : ''}
+                    </div>
+                    <div class="batch-item-status">
+                        <span class="batch-item-score ${r.status}">${r.score}分</span>
+                        <button class="btn-sm" onclick="viewDetail(${i})">详情</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 查看详情
+        function viewDetail(index) {
+            const r = batchResults[index];
+            alert(`URL: ${r.url}\n评分: ${r.score}\n问题: ${r.issues.join(', ') || '无'}`);
+        }
+
+        // 导出CSV
+        function exportToCSV() {
+            let csv = 'URL,评分,状态,问题\n';
+            batchResults.forEach(r => {
+                csv += `"${r.url}",${r.score},${r.status},"${r.issues.join('; ')}"\n`;
+            });
+            downloadFile(csv, 'seo-analysis.csv', 'text/csv');
+        }
+
+        // 导出JSON
+        function exportToJSON() {
+            const json = JSON.stringify(batchResults, null, 2);
+            downloadFile(json, 'seo-analysis.json', 'application/json');
+        }
+
+        // 导出Excel (CSV格式)
+        function exportToExcel() {
+            exportToCSV();
+        }
+
+        // 下载文件
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 批量关键词分析
+        function analyzeBatchKeywords() {
+            const keywords = document.getElementById('batchKeywords').value.split('\n').map(k => k.trim()).filter(k => k);
+
+            if (keywords.length === 0) {
+                alert('请输入关键词');
+                return;
+            }
+
+            const resultDiv = document.getElementById('keywordAnalysisResult');
+            resultDiv.innerHTML = `
+                <div class="result-card success">
+                    <h4>🔑 关键词分析结果</h4>
+                    <table class="data-table" style="margin-top: 15px;">
+                        <thead>
+                            <tr>
+                                <th>关键词</th>
+                                <th>搜索量</th>
+                                <th>竞争度</th>
+                                <th>优化难度</th>
+                                <th>建议</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${keywords.map(kw => {
+                                const volume = Math.floor(Math.random() * 10000) + 100;
+                                const competition = Math.random();
+                                const difficulty = competition > 0.7 ? '困难' : competition > 0.4 ? '中等' : '简单';
+                                return `
+                                    <tr>
+                                        <td><strong>${kw}</strong></td>
+                                        <td>${volume}</td>
+                                        <td>${(competition * 100).toFixed(0)}%</td>
+                                        <td><span class="status-badge ${difficulty === '困难' ? 'error' : difficulty === '中等' ? 'warning' : 'success'}">${difficulty}</span></td>
+                                        <td>${difficulty === '困难' ? '建议长尾词' : '可重点优化'}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // 批量元标签检查
+        function checkMetaTags() {
+            const urls = document.getElementById('metaCheckUrls').value.split('\n').map(u => u.trim()).filter(u => u);
+
+            if (urls.length === 0) {
+                alert('请输入要检查的URL');
+                return;
+            }
+
+            const resultDiv = document.getElementById('metaCheckResult');
+            resultDiv.innerHTML = `
+                <div class="result-card">
+                    <h4>🏷️ 元标签检查结果</h4>
+                    <div style="margin-top: 15px;">
+                        ${urls.map(url => `
+                            <div style="padding: 15px; background: var(--light-gray); border-radius: 8px; margin-bottom: 10px;">
+                                <strong>${url}</strong>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;">
+                                    <div>Title: <span style="color: var(--success);">✓ 正常</span></div>
+                                    <div>Description: <span style="color: ${Math.random() > 0.5 ? 'var(--success)' : 'var(--warning)'};">${Math.random() > 0.5 ? '✓ 正常' : '⚠ 需优化'}</span></div>
+                                    <div>Keywords: <span style="color: var(--success);">✓ 正常</span></div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

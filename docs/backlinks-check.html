@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>友链检测 - SEO品牌优化系统</title>
+    <meta name="description" content="检测网站友链数量、质量，导出友链报告">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .link-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: var(--light-gray); border-radius: 8px; margin-bottom: 10px; transition: all 0.3s; }
+        .link-item:hover { background: var(--white); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .link-info { display: flex; align-items: center; gap: 15px; }
+        .link-icon { width: 40px; height: 40px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .link-details h4 { margin: 0; font-size: 14px; }
+        .link-details p { margin: 5px 0 0; font-size: 12px; color: var(--gray); }
+        .link-metrics { display: flex; gap: 20px; }
+        .link-metric { text-align: center; }
+        .link-metric-value { font-size: 16px; font-weight: bold; color: var(--primary); }
+        .link-metric-label { font-size: 11px; color: var(--gray); }
+        .link-status { padding: 4px 10px; border-radius: 12px; font-size: 12px; }
+        .link-status.normal { background: #d1fae5; color: #065f46; }
+        .link-status.warning { background: #fef3c7; color: #92400e; }
+        .link-status.error { background: #fee2e2; color: #991b1b; }
+        .quality-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .quality-badge.high { background: #d1fae5; color: #065f46; }
+        .quality-badge.medium { background: #fef3c7; color: #92400e; }
+        .quality-badge.low { background: #fee2e2; color: #991b1b; }
+        .health-score { display: flex; align-items: center; justify-content: center; gap: 30px; padding: 30px; background: var(--light-gray); border-radius: 12px; }
+        .health-circle { width: 120px; height: 120px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .health-value { font-size: 36px; font-weight: bold; }
+        .health-label { font-size: 12px; color: var(--gray); }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>🔗 友链检测</h1>
+            <p class="subtitle">检测网站友链质量、导出友链报告、监控友链状态</p>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="/">📊 SEO分析</a></li>
+                <li><a href="/competitor.html">🎯 竞争对手</a></li>
+                <li><a href="/batch-seo.html">📑 批量检测</a></li>
+                <li><a href="/report.html">📈 报告生成</a></li>
+                <li><a href="/backlinks-check.html" class="active">🔗 友链检测</a></li>
+                <li><a href="/权重查询.html">⚡ 权重查询</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="container">
+            <!-- 友链检测 -->
+            <section class="card">
+                <h2>🔍 检测网站友链</h2>
+                <div class="input-group">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <input type="url" id="checkUrl" placeholder="输入要检测的网站URL" style="flex: 1; min-width: 200px;">
+                        <button onclick="checkFriendLinks()" class="btn-primary">开始检测</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 友链健康度 -->
+            <section class="card" id="healthSection" style="display: none;">
+                <h2>💚 友链健康度</h2>
+                <div class="health-score" id="healthScore">
+                    <div class="health-circle" style="background: var(--success); color: white;">
+                        <div class="health-value" id="healthPercent">85%</div>
+                        <div class="health-label">健康度</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                        <div class="link-metric">
+                            <div class="link-metric-value" id="totalLinks">0</div>
+                            <div class="link-metric-label">总友链数</div>
+                        </div>
+                        <div class="link-metric">
+                            <div class="link-metric-value" id="normalLinks">0</div>
+                            <div class="link-metric-label">正常链</div>
+                        </div>
+                        <div class="link-metric">
+                            <div class="link-metric-value" id="problemLinks">0</div>
+                            <div class="link-metric-label">问题链</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 友链列表 -->
+            <section class="card" id="linksSection" style="display: none;">
+                <h2>📋 友链列表</h2>
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <button onclick="filterLinks('all')" class="btn-sm active">全部</button>
+                    <button onclick="filterLinks('normal')" class="btn-sm">正常</button>
+                    <button onclick="filterLinks('warning')" class="btn-sm">降权</button>
+                    <button onclick="filterLinks('error')" class="btn-sm">异常</button>
+                </div>
+                <div id="linksList"></div>
+                <div class="btn-group" style="margin-top: 20px;">
+                    <button onclick="exportLinks()" class="btn-secondary">📥 导出友链</button>
+                    <button onclick="exportProblemLinks()" class="btn-outline">📥 导出问题链</button>
+                </div>
+            </section>
+
+            <!-- 批量友链检测 -->
+            <section class="card">
+                <h2>📑 批量友链检测</h2>
+                <div class="input-group">
+                    <textarea id="batchLinkUrls" rows="6" placeholder="每行输入一个URL进行批量友链检测：
+https://example1.com
+https://example2.com
+https://example3.com"></textarea>
+                </div>
+                <button onclick="batchCheckLinks()" class="btn-primary" style="margin-top: 15px;">开始批量检测</button>
+                <div id="batchCheckResult" style="margin-top: 20px;"></div>
+            </section>
+
+            <!-- 友链交换 -->
+            <section class="card">
+                <h2>🤝 友链交换建议</h2>
+                <div id="exchangeSuggestions">
+                    <p style="color: var(--gray);">输入网站URL后，根据友链情况给出交换建议</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 SEO品牌优化系统</p>
+        </div>
+    </footer>
+
+    <script>
+        let allLinks = [];
+
+        // 检测友链
+        async function checkFriendLinks() {
+            const url = document.getElementById('checkUrl').value.trim();
+            if (!url) {
+                alert('请输入网站URL');
+                return;
+            }
+
+            // 模拟友链数据
+            allLinks = generateMockLinks(15);
+
+            displayLinks();
+        }
+
+        // 生成模拟友链数据
+        function generateMockLinks(count) {
+            const statuses = ['normal', 'normal', 'normal', 'normal', 'warning', 'error'];
+            const domains = ['example1.com', 'example2.com', 'example3.com', 'test.com', 'demo.com', 'site.com', 'web.com', 'link.com'];
+            const links = [];
+
+            for (let i = 0; i < count; i++) {
+                const status = statuses[Math.floor(Math.random() * statuses.length)];
+                const domain = domains[Math.floor(Math.random() * domains.length)];
+                links.push({
+                    id: i,
+                    domain: domain,
+                    url: `https://${domain}`,
+                    name: `合作伙伴${i + 1}`,
+                    pr: Math.floor(Math.random() * 6),
+                    traffic: Math.floor(Math.random() * 10000),
+                    backlinks: Math.floor(Math.random() * 5000),
+                    status: status,
+                    addedDate: `2025-${Math.floor(Math.random() * 12) + 1}-${Math.floor(Math.random() * 28) + 1}`
+                });
+            }
+
+            return links;
+        }
+
+        // 显示友链
+        function displayLinks() {
+            const healthSection = document.getElementById('healthSection');
+            const linksSection = document.getElementById('linksSection');
+
+            healthSection.style.display = 'block';
+            linksSection.style.display = 'block';
+
+            // 统计
+            const total = allLinks.length;
+            const normal = allLinks.filter(l => l.status === 'normal').length;
+            const warning = allLinks.filter(l => l.status === 'warning').length;
+            const error = allLinks.filter(l => l.status === 'error').length;
+
+            document.getElementById('totalLinks').textContent = total;
+            document.getElementById('normalLinks').textContent = normal;
+            document.getElementById('problemLinks').textContent = warning + error;
+            document.getElementById('healthPercent').textContent = Math.round((normal / total) * 100) + '%';
+
+            renderLinksList(allLinks);
+            updateExchangeSuggestions();
+        }
+
+        // 渲染友链列表
+        function renderLinksList(links) {
+            const listDiv = document.getElementById('linksList');
+            listDiv.innerHTML = links.map(link => {
+                const quality = link.pr >= 3 ? 'high' : link.pr >= 1 ? 'medium' : 'low';
+                const statusText = { normal: '正常', warning: '降权', error: '异常' };
+                return `
+                    <div class="link-item" data-status="${link.status}">
+                        <div class="link-info">
+                            <div class="link-icon">🔗</div>
+                            <div class="link-details">
+                                <h4>${link.name}</h4>
+                                <p>${link.domain} | 添加时间: ${link.addedDate}</p>
+                            </div>
+                        </div>
+                        <div class="link-metrics">
+                            <div class="link-metric">
+                                <div class="link-metric-value">PR${link.pr}</div>
+                                <div class="link-metric-label">权重</div>
+                            </div>
+                            <div class="link-metric">
+                                <div class="link-metric-value">${link.backlinks}</div>
+                                <div class="link-metric-label">外链</div>
+                            </div>
+                            <div class="link-metric">
+                                <div class="link-metric-value">${link.traffic}</div>
+                                <div class="link-metric-label">流量</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="quality-badge ${quality}">${quality === 'high' ? '高质量' : quality === 'medium' ? '中等' : '低质量'}</span>
+                            <span class="link-status ${link.status}">${statusText[link.status]}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 筛选友链
+        function filterLinks(status) {
+            if (status === 'all') {
+                renderLinksList(allLinks);
+            } else {
+                const filtered = allLinks.filter(l => l.status === status);
+                renderLinksList(filtered);
+            }
+        }
+
+        // 导出友链
+        function exportLinks() {
+            let csv = '域名,URL,名称,PR,外链,流量,状态,添加时间\n';
+            allLinks.forEach(link => {
+                csv += `${link.domain},${link.url},${link.name},${link.pr},${link.backlinks},${link.traffic},${link.status},${link.addedDate}\n`;
+            });
+            downloadFile(csv, '友链列表.csv', 'text/csv');
+        }
+
+        // 导出问题链
+        function exportProblemLinks() {
+            const problems = allLinks.filter(l => l.status !== 'normal');
+            let csv = '域名,URL,名称,PR,问题类型\n';
+            problems.forEach(link => {
+                csv += `${link.domain},${link.url},${link.name},${link.pr},${link.status === 'warning' ? '降权' : '异常'}\n`;
+            });
+            downloadFile(csv, '问题友链.csv', 'text/csv');
+        }
+
+        // 下载文件
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 批量检测
+        async function batchCheckLinks() {
+            const urls = document.getElementById('batchLinkUrls').value.split('\n').map(u => u.trim()).filter(u => u);
+
+            if (urls.length === 0) {
+                alert('请输入要检测的URL');
+                return;
+            }
+
+            const resultDiv = document.getElementById('batchCheckResult');
+            resultDiv.innerHTML = '<div class="result-card">正在批量检测...</div>';
+
+            const results = urls.map(url => ({
+                url,
+                links: Math.floor(Math.random() * 50) + 10,
+                quality: Math.floor(Math.random() * 30) + 70
+            }));
+
+            resultDiv.innerHTML = `
+                <div class="result-card success">
+                    <h4>批量检测完成</h4>
+                    <table class="data-table" style="margin-top: 15px;">
+                        <thead>
+                            <tr>
+                                <th>网站</th>
+                                <th>友链数</th>
+                                <th>质量分</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${results.map(r => `
+                                <tr>
+                                    <td>${r.url}</td>
+                                    <td>${r.links}</td>
+                                    <td><span class="quality-badge ${r.quality >= 80 ? 'high' : r.quality >= 60 ? 'medium' : 'low'}">${r.quality}分</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // 更新交换建议
+        function updateExchangeSuggestions() {
+            const suggestions = allLinks.filter(l => l.status !== 'normal').map(l => ({
+                domain: l.domain,
+                action: l.status === 'warning' ? '建议联系对方检查' : '建议移除友链'
+            }));
+
+            const div = document.getElementById('exchangeSuggestions');
+
+            if (suggestions.length === 0) {
+                div.innerHTML = '<p style="color: var(--success);">✅ 您的友链质量良好，无需处理！</p>';
+            } else {
+                div.innerHTML = `
+                    <div class="result-card warning">
+                        <h4>⚠️ 需要关注的友链 (${suggestions.length}个)</h4>
+                        <ul style="margin-top: 15px; padding-left: 20px;">
+                            ${suggestions.map(s => `<li>${s.domain} - ${s.action}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

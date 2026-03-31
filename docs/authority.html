@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>权重查询 - SEO品牌优化系统</title>
+    <meta name="description" content="查询网站百度权重、360权重、神马权重、流量预估">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .authority-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+        .authority-card { background: var(--light-gray); border-radius: 12px; padding: 25px; text-align: center; transition: all 0.3s; }
+        .authority-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); background: var(--white); }
+        .authority-icon { font-size: 40px; margin-bottom: 15px; }
+        .authority-name { font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+        .authority-value { font-size: 36px; font-weight: bold; margin-bottom: 5px; }
+        .authority-value.baidu { color: #2932e1; }
+        .authority-value.s360 { color: #3db8f5; }
+        .authority-value.sogou { color: #63b511; }
+        .authority-value.shenma { color: #ff6600; }
+        .authority-traffic { font-size: 14px; color: var(--gray); }
+        .authority-trend { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
+        .trend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; }
+        .trend-up { color: var(--success); }
+        .trend-down { color: var(--danger); }
+        .history-chart { height: 200px; background: var(--light-gray); border-radius: 8px; display: flex; align-items: flex-end; justify-content: space-around; padding: 20px; }
+        .chart-bar { width: 40px; background: var(--primary); border-radius: 4px 4px 0 0; transition: height 0.3s; }
+        .chart-bar:hover { background: var(--primary-dark); }
+        .chart-label { text-align: center; font-size: 12px; color: var(--gray); margin-top: 10px; }
+        .domain-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; padding: 20px; background: var(--light-gray); border-radius: 8px; }
+        .domain-item { text-align: center; }
+        .domain-value { font-size: 20px; font-weight: bold; color: var(--primary); }
+        .domain-label { font-size: 12px; color: var(--gray); }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>⚡ 权重查询</h1>
+            <p class="subtitle">查询网站搜索引擎权重、流量预估、关键词排名</p>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="/">📊 SEO分析</a></li>
+                <li><a href="/competitor.html">🎯 竞争对手</a></li>
+                <li><a href="/batch-seo.html">📑 批量检测</a></li>
+                <li><a href="/report.html">📈 报告生成</a></li>
+                <li><a href="/backlinks-check.html">🔗 友链检测</a></li>
+                <li><a href="/authority.html" class="active">⚡ 权重查询</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="container">
+            <!-- 权重查询 -->
+            <section class="card">
+                <h2>🔍 查询网站权重</h2>
+                <div class="input-group">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <input type="url" id="authorityUrl" placeholder="输入要查询的网站URL" style="flex: 1; min-width: 200px;">
+                        <button onclick="queryAuthority()" class="btn-primary">查询权重</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 权重结果 -->
+            <section class="card" id="authorityResult" style="display: none;">
+                <h2>📊 权重查询结果</h2>
+                <div id="domainInfo" class="domain-info"></div>
+                <div class="authority-cards" id="authorityCards"></div>
+                <div style="margin-top: 30px;">
+                    <h3>📈 权重趋势</h3>
+                    <div class="history-chart" id="historyChart"></div>
+                </div>
+            </section>
+
+            <!-- 关键词排名 -->
+            <section class="card" id="keywordRanking" style="display: none;">
+                <h3>🔑 关键词排名</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>关键词</th>
+                            <th>排名</th>
+                            <th>搜索量</th>
+                            <th>指数</th>
+                            <th>趋势</th>
+                        </tr>
+                    </thead>
+                    <tbody id="keywordRankingBody"></tbody>
+                </table>
+            </section>
+
+            <!-- 竞争对手权重对比 -->
+            <section class="card">
+                <h2>⚔️ 权重对比</h2>
+                <div class="input-group">
+                    <textarea id="compareUrls" rows="4" placeholder="输入多个URL进行权重对比（每行一个）：
+https://example1.com
+https://example2.com
+https://example3.com"></textarea>
+                </div>
+                <button onclick="compareAuthority()" class="btn-primary" style="margin-top: 15px;">开始对比</button>
+                <div id="compareResult" style="margin-top: 20px;"></div>
+            </section>
+
+            <!-- 批量权重查询 -->
+            <section class="card">
+                <h2>📑 批量权重查询</h2>
+                <div class="input-group">
+                    <textarea id="batchAuthorityUrls" rows="6" placeholder="输入多个URL进行批量查询（每行一个）"></textarea>
+                </div>
+                <button onclick="batchQueryAuthority()" class="btn-primary" style="margin-top: 15px;">批量查询</button>
+                <div id="batchAuthorityResult" style="margin-top: 20px;"></div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 SEO品牌优化系统</p>
+        </div>
+    </footer>
+
+    <script>
+        // 查询权重
+        function queryAuthority() {
+            const url = document.getElementById('authorityUrl').value.trim();
+            if (!url) {
+                alert('请输入网站URL');
+                return;
+            }
+
+            let domain;
+            try {
+                domain = new URL(url).hostname;
+            } catch (e) {
+                domain = url;
+            }
+
+            // 生成模拟数据
+            const baiduPR = Math.floor(Math.random() * 8);
+            const s360PR = Math.floor(Math.random() * 7);
+            const sogouPR = Math.floor(Math.random() * 7);
+            const shenmaPR = Math.floor(Math.random() * 6);
+
+            const baiduTraffic = Math.floor(Math.random() * 100000);
+            const s360Traffic = Math.floor(Math.random() * 30000);
+            const sogouTraffic = Math.floor(Math.random() * 20000);
+            const shenmaTraffic = Math.floor(Math.random() * 10000);
+
+            // 显示结果
+            document.getElementById('authorityResult').style.display = 'block';
+            document.getElementById('keywordRanking').style.display = 'block';
+
+            // 域名信息
+            document.getElementById('domainInfo').innerHTML = `
+                <div class="domain-item">
+                    <div class="domain-value">${domain}</div>
+                    <div class="domain-label">查询域名</div>
+                </div>
+                <div class="domain-item">
+                    <div class="domain-value">${Math.floor(Math.random() * 10) + 1}年</div>
+                    <div class="domain-label">域名年龄</div>
+                </div>
+                <div class="domain-item">
+                    <div class="domain-value">${Math.floor(Math.random() * 5000) + 500}</div>
+                    <div class="domain-label">收录页面</div>
+                </div>
+                <div class="domain-item">
+                    <div class="domain-value">${Math.floor(Math.random() * 50000) + 1000}</div>
+                    <div class="domain-label">外链数量</div>
+                </div>
+            `;
+
+            // 权重卡片
+            document.getElementById('authorityCards').innerHTML = `
+                <div class="authority-card">
+                    <div class="authority-icon">📚</div>
+                    <div class="authority-name">百度权重</div>
+                    <div class="authority-value baidu">${baiduPR}</div>
+                    <div class="authority-traffic">预估流量: ${baiduTraffic}</div>
+                </div>
+                <div class="authority-card">
+                    <div class="authority-icon">🔎</div>
+                    <div class="authority-name">360权重</div>
+                    <div class="authority-value s360">${s360PR}</div>
+                    <div class="authority-traffic">预估流量: ${s360Traffic}</div>
+                </div>
+                <div class="authority-card">
+                    <div class="authority-icon">🐶</div>
+                    <div class="authority-name">搜狗权重</div>
+                    <div class="authority-value sogou">${sogouPR}</div>
+                    <div class="authority-traffic">预估流量: ${sogouTraffic}</div>
+                </div>
+                <div class="authority-card">
+                    <div class="authority-icon">🔰</div>
+                    <div class="authority-name">神马权重</div>
+                    <div class="authority-value shenma">${shenmaPR}</div>
+                    <div class="authority-traffic">预估流量: ${shenmaTraffic}</div>
+                </div>
+            `;
+
+            // 趋势图
+            const months = ['1月', '2月', '3月', '4月', '5月', '6月'];
+            document.getElementById('historyChart').innerHTML = months.map((m, i) => {
+                const height = Math.floor(Math.random() * 80) + 20;
+                return `
+                    <div>
+                        <div class="chart-bar" style="height: ${height}%;"></div>
+                        <div class="chart-label">${m}</div>
+                    </div>
+                `;
+            }).join('');
+
+            // 关键词排名
+            const keywords = [
+                { kw: 'SEO优化', rank: Math.floor(Math.random() * 50) + 1, volume: 5000, index: 3200 },
+                { kw: '网站推广', rank: Math.floor(Math.random() * 50) + 1, volume: 3000, index: 2100 },
+                { kw: '品牌营销', rank: Math.floor(Math.random() * 50) + 1, volume: 2500, index: 1800 },
+                { kw: '关键词优化', rank: Math.floor(Math.random() * 50) + 1, volume: 2000, index: 1500 },
+                { kw: '内容营销', rank: Math.floor(Math.random() * 50) + 1, volume: 1500, index: 1200 }
+            ];
+
+            document.getElementById('keywordRankingBody').innerHTML = keywords.map(k => `
+                <tr>
+                    <td><strong>${k.kw}</strong></td>
+                    <td>${k.rank}</td>
+                    <td>${k.volume}</td>
+                    <td>${k.index}</td>
+                    <td class="trend-up">↑ ${Math.floor(Math.random() * 10) + 1}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 权重对比
+        function compareAuthority() {
+            const urls = document.getElementById('compareUrls').value.split('\n').map(u => u.trim()).filter(u => u);
+
+            if (urls.length < 2) {
+                alert('请输入至少2个URL进行对比');
+                return;
+            }
+
+            const resultDiv = document.getElementById('compareResult');
+            resultDiv.innerHTML = `
+                <div class="result-card">
+                    <h4>⚔️ 权重对比结果</h4>
+                    <table class="data-table" style="margin-top: 15px;">
+                        <thead>
+                            <tr>
+                                <th>网站</th>
+                                <th>百度权重</th>
+                                <th>360权重</th>
+                                <th>搜狗权重</th>
+                                <th>综合评分</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${urls.map(url => {
+                                const domain = url.replace(/https?:\/\//, '').split('/')[0];
+                                const baidu = Math.floor(Math.random() * 8);
+                                const s360 = Math.floor(Math.random() * 7);
+                                const sogou = Math.floor(Math.random() * 7);
+                                const score = Math.floor((baidu + s360 + sogou) / 3 * 20);
+                                return `
+                                    <tr>
+                                        <td><strong>${domain}</strong></td>
+                                        <td class="authority-value baidu">${baidu}</td>
+                                        <td class="authority-value s360">${s360}</td>
+                                        <td class="authority-value sogou">${sogou}</td>
+                                        <td><span class="status-badge ${score >= 70 ? 'success' : score >= 50 ? 'warning' : 'error'}">${score}分</span></td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // 批量查询
+        function batchQueryAuthority() {
+            const urls = document.getElementById('batchAuthorityUrls').value.split('\n').map(u => u.trim()).filter(u => u);
+
+            if (urls.length === 0) {
+                alert('请输入要查询的URL');
+                return;
+            }
+
+            const resultDiv = document.getElementById('batchAuthorityResult');
+            resultDiv.innerHTML = '<div class="result-card">正在批量查询...</div>';
+
+            const results = urls.map(url => {
+                const domain = url.replace(/https?:\/\//, '').split('/')[0];
+                return {
+                    url: domain,
+                    baidu: Math.floor(Math.random() * 8),
+                    traffic: Math.floor(Math.random() * 50000)
+                };
+            });
+
+            resultDiv.innerHTML = `
+                <div class="result-card success">
+                    <h4>批量查询完成</h4>
+                    <div style="margin-top: 15px;">
+                        ${results.map(r => `
+                            <div style="display: flex; justify-content: space-between; padding: 10px; background: var(--light-gray); border-radius: 8px; margin-bottom: 8px;">
+                                <span><strong>${r.url}</strong></span>
+                                <span>
+                                    <span class="authority-value baidu" style="font-size: 20px;">${r.baidu}</span>
+                                    <span style="color: var(--gray); margin-left: 10px;">流量: ${r.traffic}</span>
+                                </span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
